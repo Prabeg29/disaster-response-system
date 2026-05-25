@@ -92,6 +92,31 @@ public class Database {
                     + "    REFERENCES users(id) ON DELETE RESTRICT"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
             );
+
+            // -----------------------------------------------------------------
+            // 3. disaster_assessments   (depends on users, disaster_reports)
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS disaster_assessments ("
+                + "  id                         INT          NOT NULL AUTO_INCREMENT, "
+                + "  report_id                  INT          NOT NULL, "
+                + "  assessor_id                INT          NOT NULL, "
+                + "  assessed_severity          VARCHAR(20)  NOT NULL, "
+                + "  estimated_affected         INT          NOT NULL DEFAULT 0, "
+                + "  is_infrastructure_damaged  TINYINT(1)   NOT NULL DEFAULT 0, "
+                + "  is_hazard_active           TINYINT(1)   NOT NULL DEFAULT 0, "
+                + "  priority_score             INT          NOT NULL DEFAULT 0, "
+                + "  recommended_actions        VARCHAR(500)     NULL, "
+                + "  assigned_departments       VARCHAR(500)     NULL, "
+                + "  assessment_notes           TEXT             NULL, "
+                + "  assessed_at                TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                + "  PRIMARY KEY (assessment_id), "
+                + "  CONSTRAINT fk_assess_report "
+                + "    FOREIGN KEY (report_id)   REFERENCES disaster_reports(id), "
+                + "  CONSTRAINT fk_assess_assessor "
+                + "    FOREIGN KEY (assessor_id) REFERENCES users(id)"
+                + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
         }
     }
 }
