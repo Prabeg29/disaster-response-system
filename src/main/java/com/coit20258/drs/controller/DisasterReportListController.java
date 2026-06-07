@@ -21,6 +21,7 @@ import com.coit20258.drs.dao.DisasterReportDaoImpl;
 import com.coit20258.drs.model.DisasterReport;
 import com.coit20258.drs.model.User;
 import com.coit20258.drs.util.SceneManager;
+import com.coit20258.drs.controller.DisasterAssessmentController;
 
 public class DisasterReportListController implements Initializable {
 
@@ -71,7 +72,7 @@ public class DisasterReportListController implements Initializable {
     private void setupTableColumns() {
         colType.setCellValueFactory(new PropertyValueFactory<>("disasterType"));
         colLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
-        colSeverity.setCellValueFactory(new PropertyValueFactory<>("severity"));
+        colSeverity.setCellValueFactory(new PropertyValueFactory<>("severityLevel"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colReportedBy.setCellValueFactory(new PropertyValueFactory<>("reportedBy"));
         colReportedAt.setCellValueFactory(new PropertyValueFactory<>("reportedAt"));
@@ -80,7 +81,7 @@ public class DisasterReportListController implements Initializable {
         colStatus.setCellFactory(col -> buildStatusComboCell());
         colReportedBy.setCellFactory(col -> buildReportedByCell());
         colReportedAt.setCellFactory(col -> buildDateCell());
-//        colAction.setCellFactory(col -> buildActionCell());
+        colAction.setCellFactory(col -> buildActionCell());
     }
 
     private void loadReportsAsync() {
@@ -193,25 +194,25 @@ public class DisasterReportListController implements Initializable {
         };
     }
 
-//    private TableCell<DisasterReport, Void> buildActionCell() {
-//        return new TableCell<>() {
-//            private final Button btn = new Button("View Assessment");
-//
-//            {
-//                btn.getStyleClass().add("btn-action");
-//                btn.setOnAction(e -> {
-//                    DisasterReport r = getTableView().getItems().get(getIndex());
-//                    DisasterAssessmentController ctrl
-//                            = SceneManager.switchContentWithController("DisasterAssessmentView");
-//                    ctrl.loadContext(r);
-//                });
-//            }
-//
-//            @Override
-//            protected void updateItem(Void item, boolean empty) {
-//                super.updateItem(item, empty);
-//                setGraphic(empty ? null : btn);
-//            }
-//        };
-//    }
+    private TableCell<DisasterReport, Void> buildActionCell() {
+        return new TableCell<>() {
+            private final Button btn = new Button("Assess");
+
+            {
+                btn.getStyleClass().add("btn-action");
+                btn.setOnAction(e -> {
+                    DisasterReport r = getTableView().getItems().get(getIndex());
+                    DisasterAssessmentController ctrl
+                            = SceneManager.switchContentWithController("DisasterAssessmentView");
+                    ctrl.loadContext(r);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : btn);
+            }
+        };
+    }
 }

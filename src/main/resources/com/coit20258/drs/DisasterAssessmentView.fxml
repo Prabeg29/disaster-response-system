@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    DisasterAssessmentView.fxml
+    Content view — loaded into AppShellView's contentArea.
+    Controller: com.coit20258.drs.controller.DisasterAssessmentController
+-->
+<VBox
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.coit20258.drs.controller.DisasterAssessmentController">
+
+    <!-- ── Content header ───────────────────────────────────────── -->
+    <HBox styleClass="content-header" alignment="CENTER_LEFT" spacing="12">
+        <Button text="← Back to Reports"
+                styleClass="btn-secondary"
+                onAction="#handleBack"/>
+        <Separator orientation="VERTICAL"
+                   style="-fx-padding:0 4 0 4;"/>
+        <VBox spacing="0" HBox.hgrow="ALWAYS">
+            <Label fx:id="headerReportLabel"
+                   text="Disaster Assessment"
+                   styleClass="content-header-title"/>
+            <Label text="Review the report and submit your assessment."
+                   styleClass="content-header-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Scrollable form body ─────────────────────────────────── -->
+    <ScrollPane fitToWidth="true" styleClass="scroll-pane"
+                hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+
+        <VBox styleClass="content-body" spacing="20">
+            <padding>
+                <Insets top="20" right="0" bottom="20" left="0"/>
+            </padding>
+
+            <!-- ── Report summary card ──────────────────────────── -->
+            <VBox styleClass="summary-card" spacing="0">
+
+                <HBox style="-fx-padding:14 20 14 20;
+                             -fx-border-color:transparent transparent #e2e8f0 transparent;
+                             -fx-border-width:0 0 1 0;"
+                      alignment="CENTER_LEFT" spacing="10">
+                    <Label text="📋" style="-fx-font-size:15px;"/>
+                    <Label text="Incident Report Summary" styleClass="card-title"/>
+                </HBox>
+
+                <HBox style="-fx-padding:16 20 8 20;" spacing="40">
+                    <VBox spacing="3">
+                        <Label text="TYPE" styleClass="summary-label"/>
+                        <Label fx:id="summaryType" text="—" styleClass="summary-value"/>
+                    </VBox>
+                    <VBox spacing="3">
+                        <Label text="LOCATION" styleClass="summary-label"/>
+                        <Label fx:id="summaryLocation" text="—" styleClass="summary-value"/>
+                    </VBox>
+                    <VBox spacing="3">
+                        <Label text="REPORTED BY · DATE" styleClass="summary-label"/>
+                        <Label fx:id="summaryReported" text="—" styleClass="summary-value"/>
+                    </VBox>
+                </HBox>
+
+                <VBox style="-fx-padding:0 20 16 20;" spacing="3">
+                    <Label text="DESCRIPTION" styleClass="summary-label"/>
+                    <Label fx:id="summaryDescription" text="—"
+                           styleClass="summary-value" wrapText="true"/>
+                </VBox>
+
+            </VBox>
+
+            <!-- ── Assessment form card ──────────────────────────── -->
+            <VBox styleClass="form-panel" spacing="0">
+
+                <HBox styleClass="form-header" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets top="16" right="24" bottom="16" left="24"/>
+                    </padding>
+                    <Label text="🔍" style="-fx-font-size:16px; -fx-padding:0 10 0 0;"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Assessment Details" styleClass="form-title"/>
+                        <Label text="Fields marked * are required"
+                               styleClass="section-subtitle"/>
+                    </VBox>
+                    <!-- Priority score badge -->
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="PRIORITY SCORE" styleClass="summary-label"/>
+                        <Label fx:id="priorityScoreLabel" text="0"
+                               styleClass="priority-score-badge"/>
+                    </VBox>
+                </HBox>
+
+                <VBox styleClass="form-body" spacing="20">
+                    <padding>
+                        <Insets top="24" right="28" bottom="28" left="28"/>
+                    </padding>
+
+                    <!-- Severity + Estimated Affected -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Assessed Severity *" styleClass="field-label"/>
+                            <ComboBox fx:id="assessedSeverityCombo"
+                                      styleClass="field-combo"
+                                      promptText="Select severity level"
+                                      maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Estimated People Affected *" styleClass="field-label"/>
+                            <TextField fx:id="estimatedAffectedField"
+                                       styleClass="field-input"
+                                       promptText="e.g. 250"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Checkboxes -->
+                    <HBox spacing="40">
+                        <CheckBox fx:id="infrastructureDamagedCheck"
+                                  text="Infrastructure Damaged"
+                                  styleClass="field-checkbox"/>
+                        <CheckBox fx:id="hazardActiveCheck"
+                                  text="Hazard Still Active"
+                                  styleClass="field-checkbox"/>
+                    </HBox>
+
+                    <!-- Recommended Actions + Assigned Departments -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Recommended Actions * (hold Ctrl to multi-select)"
+                                   styleClass="field-label"/>
+                            <ListView fx:id="recommendedActionsList"
+                                      styleClass="field-listview"
+                                      prefHeight="180"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Assigned Departments * (hold Ctrl to multi-select)"
+                                   styleClass="field-label"/>
+                            <ListView fx:id="assignedDepartmentsList"
+                                      styleClass="field-listview"
+                                      prefHeight="180"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Assessment Notes -->
+                    <VBox spacing="6">
+                        <Label text="Assessment Notes" styleClass="field-label"/>
+                        <TextArea fx:id="assessmentNotesArea"
+                                  styleClass="field-textarea"
+                                  promptText="Additional observations, on-site conditions, special instructions…"
+                                  prefRowCount="4"
+                                  wrapText="true"/>
+                    </VBox>
+
+                    <!-- Validation banner -->
+                    <Label fx:id="validationLabel"
+                           styleClass="validation-label"
+                           wrapText="true"
+                           managed="false" visible="false"/>
+
+                    <!-- Actions -->
+                    <HBox spacing="12" alignment="CENTER_RIGHT"
+                          style="-fx-padding:8 0 0 0;">
+                        <Button text="Cancel"
+                                styleClass="btn-secondary"
+                                onAction="#handleBack"/>
+                        <Button fx:id="submitButton"
+                                text="Submit Assessment"
+                                styleClass="btn-primary"
+                                defaultButton="true"
+                                onAction="#handleSubmit"/>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+</VBox>
