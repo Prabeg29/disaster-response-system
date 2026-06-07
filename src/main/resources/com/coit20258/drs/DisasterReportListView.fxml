@@ -26,6 +26,18 @@
                 onAction="#handleNewReport"/>
     </HBox>
 
+    <!-- ── Department filter bar ────────────────────────────────── -->
+    <HBox styleClass="action-bar" alignment="CENTER_LEFT" spacing="12">
+        <padding>
+            <Insets top="12" right="28" bottom="12" left="28"/>
+        </padding>
+        <Label text="Filter by Department:" styleClass="field-label"/>
+        <ComboBox fx:id="departmentFilterCombo"
+                  styleClass="field-combo"
+                  promptText="All departments"
+                  prefWidth="220"/>
+    </HBox>
+
     <!-- ── Banner (success / error, hidden by default) ──────────── -->
     <Label fx:id="bannerLabel"
            wrapText="true"
