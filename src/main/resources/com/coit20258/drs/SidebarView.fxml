@@ -44,12 +44,6 @@
                 maxWidth="Infinity"
                 onAction="#handleNavAssessments"/>
 
-        <Button fx:id="navDepartments"
-                text="🏢   Departments"
-                styleClass="nav-item"
-                maxWidth="Infinity"
-                onAction="#handleNavDepartments"/>
-
         <Button fx:id="navEvacuation"
                 text="🗺   Evacuation Zones"
                 styleClass="nav-item"
