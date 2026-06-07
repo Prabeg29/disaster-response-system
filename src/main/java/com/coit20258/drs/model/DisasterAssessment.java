@@ -17,7 +17,7 @@ public class DisasterAssessment {
     private static final int SCORE_HAZARD_ACTIVE = 15;
 
     // ── Fields ─────────────────────────────────────────────────────────────
-    private int assessmentId;
+    private int id;
     private int reportId;
     private DisasterReport disasterReport;
     private int assessorId;
@@ -32,14 +32,13 @@ public class DisasterAssessment {
     private String assessmentNotes;
     private LocalDateTime assessedAt;
 
-    // ── Constructors ───────────────────────────────────────────────────────
     public DisasterAssessment() {
         this.recommendedActions = new ArrayList<>();
         this.assignedDepartments = new ArrayList<>();
     }
 
     public DisasterAssessment(
-            int reportId,
+            int id,
             int assessorId,
             String assessedSeverity,
             int estimatedAffected,
@@ -49,7 +48,7 @@ public class DisasterAssessment {
             List<String> recommendedActions,
             List<Department> assignedDepartments) {
 
-        this.reportId = reportId;
+        this.id = id;
         this.assessorId = assessorId;
         this.assessedSeverity = assessedSeverity;
         this.estimatedAffected = estimatedAffected;
@@ -64,7 +63,7 @@ public class DisasterAssessment {
     }
 
     public DisasterAssessment(
-            int assessmentId,
+            int id,
             int reportId,
             DisasterReport disasterReport,
             int assessorId,
@@ -79,7 +78,7 @@ public class DisasterAssessment {
             List<Department> assignedDepartments,
             LocalDateTime assessedAt) {
 
-        this.assessmentId = assessmentId;
+        this.id = id;
         this.reportId = reportId;
         this.disasterReport = disasterReport;
         this.assessorId = assessorId;
@@ -128,13 +127,8 @@ public class DisasterAssessment {
         return score;
     }
 
-    // ── Getters & Setters ──────────────────────────────────────────────────
-    public int getAssessmentId() {
-        return assessmentId;
-    }
-
-    public void setAssessmentId(int id) {
-        this.assessmentId = id;
+    public int getId() {
+        return id;
     }
 
     public int getReportId() {
@@ -261,6 +255,6 @@ public class DisasterAssessment {
     @Override
     public String toString() {
         return String.format("[%d] → Report: %d | Severity: %s | Score: %d | Depts: %s",
-                assessmentId, reportId, assessedSeverity, priorityScore, assignedDepartments);
+                id, reportId, assessedSeverity, priorityScore, assignedDepartments);
     }
 }

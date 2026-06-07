@@ -24,12 +24,8 @@ public class Department {
     }
 
     // ── Getters & Setters ──────────────────────────────────────────────────
-    public int getDepartmentId() {
+    public int getId() {
         return id;
-    }
-
-    public void setDepartmentId(int departmentId) {
-        this.id = departmentId;
     }
 
     public String getName() {
