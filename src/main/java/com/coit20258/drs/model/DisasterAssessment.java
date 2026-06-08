@@ -1,10 +1,13 @@
 package com.coit20258.drs.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisasterAssessment {
+public class DisasterAssessment implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // ── Scoring constants ──────────────────────────────────────────────────
     private static final int SCORE_SEVERITY_CRITICAL = 40;
