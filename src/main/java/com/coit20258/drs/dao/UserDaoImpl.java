@@ -16,8 +16,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User register(User user) {
-        String SQL = "INSERT INTO users (email, passwordHash, firstName, lastName, role, isActive)"
-                + "VALUES (?, ?, ?, ? , ? , ?)";
+        String SQL = "INSERT INTO users (email, passwordHash, firstName, lastName, role, isActive, departmentId)"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (
                 Connection conn = Database.getConnection(); PreparedStatement ps = conn.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -27,6 +27,7 @@ public class UserDaoImpl implements UserDao {
             ps.setString(4, user.getLastName());
             ps.setString(5, user.getRole());
             ps.setBoolean(6, user.isActive());
+            ps.setInt(7, user.getDepartmentId());
 
             int result = ps.executeUpdate();
             if (result == 0) {
@@ -130,6 +131,7 @@ public class UserDaoImpl implements UserDao {
                 rs.getString("passwordHash"),
                 rs.getString("role"),
                 rs.getBoolean("isActive"),
+                rs.getInt("departmentId"),
                 createdAt != null ? createdAt.toLocalDateTime() : null,
                 null
         );
