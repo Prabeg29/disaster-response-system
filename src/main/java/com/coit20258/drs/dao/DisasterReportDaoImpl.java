@@ -142,6 +142,27 @@ public class DisasterReportDaoImpl implements DisasterReportDao {
         }
     }
 
+    @Override
+    public List<DisasterReport> findAssignedToDepartment(int departmentId) {
+        final String SQL = SELECT_WITH_USER
+                + "JOIN disaster_assessments a ON a.reportId = dr.id "
+                + "WHERE FIND_IN_SET(?, a.assignedDepartments) > 0 "
+                + "ORDER BY dr.reportedAt DESC";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            ps.setString(1, String.valueOf(departmentId));
+            try (ResultSet rs = ps.executeQuery()) {
+                List<DisasterReport> reports = new ArrayList<>();
+                while (rs.next()) reports.add(mapRow(rs));
+                return reports;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Database error during findAssignedToDepartment: " + e.getMessage(), e);
+        }
+    }
+
     private DisasterReport mapRow(ResultSet rs) throws SQLException {
         Timestamp reportedAt = rs.getTimestamp("reportedAt");
 

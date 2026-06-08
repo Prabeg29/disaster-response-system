@@ -16,4 +16,6 @@ public interface DisasterReportDao {
     List<DisasterReport> findByReporterId(int reporterId);
 
     boolean updateStatus(int id, String status);
+
+    List<DisasterReport> findAssignedToDepartment(int departmentId);
 }
