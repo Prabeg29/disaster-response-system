@@ -27,34 +27,40 @@
     <VBox VBox.vgrow="ALWAYS">
 
         <Button fx:id="navDashboard"
-                text="📊   Priority Dashboard"
+                text="Priority Dashboard"
                 styleClass="nav-item"
                 maxWidth="Infinity"
                 onAction="#handleNavDashboard"/>
 
         <Button fx:id="navReports"
-                text="🚨   Disaster Reports"
+                text="Disaster Reports"
                 styleClass="nav-item"
                 maxWidth="Infinity"
                 onAction="#handleNavReports"/>
 
         <Button fx:id="navAssessments"
-                text="📋   Assessments"
+                text="Assessments"
                 styleClass="nav-item"
                 maxWidth="Infinity"
                 onAction="#handleNavAssessments"/>
 
         <Button fx:id="navEvacuation"
-                text="🗺   Evacuation Zones"
+                text="Evacuation Zones"
                 styleClass="nav-item"
                 maxWidth="Infinity"
                 onAction="#handleNavEvacuation"/>
 
         <Button fx:id="navResources"
-                text="📦   Resources"
+                text="Resources"
                 styleClass="nav-item"
                 maxWidth="Infinity"
                 onAction="#handleNavResources"/>
+
+        <Button fx:id="navDeptCoordination"
+                text="Dept. Coordination"
+                styleClass="nav-item"
+                maxWidth="Infinity"
+                onAction="#handleNavDeptCoordination"/>
 
     </VBox>
 

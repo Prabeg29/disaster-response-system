@@ -34,6 +34,8 @@ public class SidebarController implements Initializable {
     private Button navEvacuation;
     @FXML
     private Button navResources;
+    @FXML
+    private Button navDeptCoordination;
 
     /**
      * All nav buttons in display order — used for bulk style reset.
@@ -46,7 +48,7 @@ public class SidebarController implements Initializable {
         // Populated after FXML injection completes
         allNavButtons = List.of(
                 navDashboard, navReports, navAssessments,
-                navEvacuation, navResources
+                navEvacuation, navResources, navDeptCoordination
         );
         populateUserInfo();
     }
@@ -109,6 +111,11 @@ public class SidebarController implements Initializable {
     }
 
     @FXML
+    private void handleNavDeptCoordination() {
+        SceneManager.switchContent("DepartmentCoordinationView");
+    }
+
+    @FXML
     private void handleLogout() {
         SessionContext.clearSession();
         SceneManager.switchTo("LoginView");
@@ -146,6 +153,8 @@ public class SidebarController implements Initializable {
                 navEvacuation;
             case "ResourceView" ->
                 navResources;
+            case "DepartmentCoordinationView" ->
+                navDeptCoordination;
             default ->
                 null;
         };
