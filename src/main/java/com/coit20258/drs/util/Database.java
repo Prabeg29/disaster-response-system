@@ -119,7 +119,34 @@ public class Database {
             );
 
             // -----------------------------------------------------------------
-            // 4. disaster_assessments   (depends on users, disaster_reports)
+            // 4. department_updates   (depends on users, disaster_reports, departments)
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS department_updates ("
+                    + "  id              INT          NOT NULL AUTO_INCREMENT, "
+                    + "  reportId        INT          NOT NULL, "
+                    + "  departmentId    INT          NOT NULL, "
+                    + "  updatedById     INT          NOT NULL, "
+                    + "  updateText      TEXT         NOT NULL, "
+                    + "  responseStatus  VARCHAR(20)  NOT NULL DEFAULT 'RESPONDING', "
+                    + "  updatedAt       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "  PRIMARY KEY (id), "
+                    + "  CONSTRAINT fk_du_report     FOREIGN KEY (reportId)     REFERENCES disaster_reports(id), "
+                    + "  CONSTRAINT fk_du_department FOREIGN KEY (departmentId) REFERENCES departments(id), "
+                    + "  CONSTRAINT fk_du_user       FOREIGN KEY (updatedById)  REFERENCES users(id)"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
+
+            // Add departmentId column to users if it doesn't exist yet
+            try {
+                stmt.executeUpdate(
+                        "ALTER TABLE users ADD COLUMN departmentId INT NOT NULL DEFAULT 0");
+            } catch (SQLException ignored) {
+                // Column already exists — safe to ignore duplicate column error (1060)
+            }
+
+            // -----------------------------------------------------------------
+            // 5. disaster_assessments   (depends on users, disaster_reports)
             // -----------------------------------------------------------------
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS disaster_assessments ("
