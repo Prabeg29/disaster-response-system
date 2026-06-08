@@ -19,16 +19,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import com.coit20258.drs.dao.DepartmentDao;
-import com.coit20258.drs.dao.DepartmentDaoImpl;
-import com.coit20258.drs.dao.DisasterAssessmentDao;
-import com.coit20258.drs.dao.DisasterAssessmentDaoImpl;
-import com.coit20258.drs.dao.DisasterReportDao;
-import com.coit20258.drs.dao.DisasterReportDaoImpl;
 import com.coit20258.drs.model.Department;
 import com.coit20258.drs.model.DisasterAssessment;
 import com.coit20258.drs.model.DisasterReport;
 import com.coit20258.drs.model.User;
+import com.coit20258.drs.service.AppService;
 import com.coit20258.drs.util.SceneManager;
 
 public class DisasterReportListController implements Initializable {
@@ -50,9 +45,7 @@ public class DisasterReportListController implements Initializable {
     @FXML private Label                                  bannerLabel;
     @FXML private ComboBox<Department>                   departmentFilterCombo;
 
-    private final DisasterReportDao     reportDao     = new DisasterReportDaoImpl();
-    private final DisasterAssessmentDao assessmentDao = new DisasterAssessmentDaoImpl();
-    private final DepartmentDao         departmentDao = new DepartmentDaoImpl();
+    private final AppService service = AppService.getInstance();
 
     private List<DisasterReport>     allReports    = List.of();
     // reportId → set of department IDs assigned via its assessment
@@ -95,9 +88,9 @@ public class DisasterReportListController implements Initializable {
     private void loadDataAsync() {
         new Thread(() -> {
             try {
-                List<DisasterReport> reports       = reportDao.findAll();
-                List<DisasterAssessment> assessments = assessmentDao.findAll();
-                List<Department> departments        = departmentDao.findAll();
+                List<DisasterReport> reports         = service.findAllReports();
+                List<DisasterAssessment> assessments = service.findAllAssessments();
+                List<Department> departments         = service.findAllDepartments();
 
                 Map<Integer, Set<Integer>> deptMap = assessments.stream()
                         .collect(Collectors.toMap(
@@ -204,7 +197,7 @@ public class DisasterReportListController implements Initializable {
                     if (selected != null && !selected.equals(r.getStatus())) {
                         new Thread(() -> {
                             try {
-                                reportDao.updateStatus(r.getId(), selected);
+                                service.updateReportStatus(r.getId(), selected);
                                 r.setStatus(selected);
                                 Platform.runLater(() -> getTableView().refresh());
                             } catch (Exception ex) {

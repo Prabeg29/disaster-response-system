@@ -15,13 +15,10 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.coit20258.drs.dao.DisasterAssessmentDao;
-import com.coit20258.drs.dao.DepartmentDao;
-import com.coit20258.drs.dao.DisasterAssessmentDaoImpl;
-import com.coit20258.drs.dao.DepartmentDaoImpl;
 import com.coit20258.drs.model.Department;
 import com.coit20258.drs.model.DisasterAssessment;
 import com.coit20258.drs.model.DisasterReport;
+import com.coit20258.drs.service.AppService;
 import com.coit20258.drs.util.SceneManager;
 import com.coit20258.drs.util.SessionContext;
 
@@ -71,8 +68,7 @@ public class DisasterAssessmentController implements Initializable {
     private DisasterReport     linkedReport;
     private DisasterAssessment existingAssessment;
 
-    private final DisasterAssessmentDao assessmentDao = new DisasterAssessmentDaoImpl();
-    private final DepartmentDao         departmentDao = new DepartmentDaoImpl();
+    private final AppService service = AppService.getInstance();
 
     // ── Initialise ─────────────────────────────────────────────────────────
 
@@ -114,7 +110,7 @@ public class DisasterAssessmentController implements Initializable {
         new Thread(() -> {
             try {
                 Optional<DisasterAssessment> found =
-                        assessmentDao.findByReportId(report.getId());
+                        service.findAssessmentByReport(report.getId());
                 Platform.runLater(() -> {
                     found.ifPresent(a -> {
                         existingAssessment = a;
@@ -145,11 +141,11 @@ public class DisasterAssessmentController implements Initializable {
             try {
                 if (existingAssessment != null) {
                     applyFormToAssessment(existingAssessment);
-                    assessmentDao.update(existingAssessment);
+                    service.updateAssessment(existingAssessment);
                     LOGGER.info("Assessment updated: id=" + existingAssessment.getId());
                 } else {
                     DisasterAssessment newAssessment = buildAssessment();
-                    assessmentDao.save(newAssessment);
+                    service.saveAssessment(newAssessment);
                     LOGGER.info("Assessment saved: id=" + newAssessment.getId());
                 }
                 Platform.runLater(() ->
@@ -178,7 +174,7 @@ public class DisasterAssessmentController implements Initializable {
     private void loadDepartmentsAsync() {
         new Thread(() -> {
             try {
-                List<Department> departments = departmentDao.findAll();
+                List<Department> departments = service.findAllDepartments();
                 Platform.runLater(() ->
                     assignedDepartmentsList.setItems(
                         FXCollections.observableArrayList(departments)));

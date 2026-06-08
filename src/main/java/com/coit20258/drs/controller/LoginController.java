@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -13,9 +14,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-import com.coit20258.drs.dao.UserDao;
-import com.coit20258.drs.dao.UserDaoImpl;
 import com.coit20258.drs.model.User;
+import com.coit20258.drs.service.AppService;
 import com.coit20258.drs.util.SceneManager;
 import com.coit20258.drs.util.SessionContext;
 
@@ -33,7 +33,7 @@ public class LoginController implements Initializable {
     @FXML
     private Button loginButton;
 
-    private final UserDao userDao = new UserDaoImpl();
+    private final AppService service = AppService.getInstance();
 
     // ── Initialisation ─────────────────────────────────────────────────────
     @Override
@@ -66,7 +66,7 @@ public class LoginController implements Initializable {
 
         new Thread(() -> {
             try {
-                Optional<User> result = userDao.login(email, password);
+                Optional<User> result = service.login(email, password);
                 Platform.runLater(() -> {
                     loginButton.setDisable(false);
                     loginButton.setText("Sign In");
@@ -96,7 +96,11 @@ public class LoginController implements Initializable {
     private void onLoginSuccess(User user) {
         SessionContext.setCurrentUser(user);
         LOGGER.info("Login success — " + user.getEmail() + " role=" + user.getRole());
-        SceneManager.switchContent("DisasterReportListView");
+        if (User.ROLE_DEPARTMENT.equals(user.getRole())) {
+            SceneManager.switchContent("DepartmentCoordinationView");
+        } else {
+            SceneManager.switchContent("DisasterReportListView");
+        }
     }
 
     private void onLoginFailure() {
