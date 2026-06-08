@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import com.coit20258.drs.server.DrsServer;
 import com.coit20258.drs.util.Database;
 import com.coit20258.drs.util.SceneManager;
 
@@ -17,7 +18,8 @@ public class Drs extends Application {
         LOGGER.info("DRS-Enhanced starting up...");
  
         Database.boot();
-        SceneManager.init(primaryStage, 1100, 720); 
+        DrsServer.start();
+        SceneManager.init(primaryStage, 1100, 720);
         SceneManager.switchTo("LoginView");
  
         LOGGER.info("DRS-Enhanced ready.");
