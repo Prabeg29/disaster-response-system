@@ -176,6 +176,17 @@
                                        styleClass="field-hint"/>
                             </VBox>
 
+                            <!-- Department selector — shown only for Department Coordinator -->
+                            <VBox fx:id="departmentSection" spacing="6" managed="false" visible="false">
+                                <Label text="Department" styleClass="field-label"/>
+                                <ComboBox fx:id="departmentCombo"
+                                          styleClass="field-combo"
+                                          maxWidth="Infinity"
+                                          promptText="Select your department…"/>
+                                <Label text="Select the department you coordinate for."
+                                       styleClass="field-hint"/>
+                            </VBox>
+
                             <!-- Global feedback banner -->
                             <Label fx:id="feedbackLabel" styleClass="validation-label"
                                    wrapText="true" managed="false" visible="false"/>
