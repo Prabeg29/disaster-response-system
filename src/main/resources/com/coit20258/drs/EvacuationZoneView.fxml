@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.coit20258.drs.controller.EvacuationZoneController">
+
+    <!-- ── Content header ──────────────────────────────────────────────── -->
+    <HBox styleClass="content-header" alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Evacuation Zone Management"
+                   styleClass="content-header-title"/>
+            <Label text="Create and monitor evacuation zones linked to disaster reports"
+                   styleClass="content-header-subtitle"/>
+        </VBox>
+        <Button text="Refresh"
+                styleClass="btn-secondary"
+                onAction="#handleRefresh"/>
+    </HBox>
+
+    <!-- ── Banner ──────────────────────────────────────────────────────── -->
+    <Label fx:id="bannerLabel"
+           wrapText="true"
+           managed="false" visible="false"
+           style="-fx-padding:8 28 8 28;"/>
+
+    <!-- ── Main content: split pane ────────────────────────────────────── -->
+    <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.60">
+
+        <!-- LEFT: Evacuation zones table -->
+        <VBox styleClass="content-body" spacing="10">
+            <padding><Insets top="16" right="12" bottom="16" left="16"/></padding>
+
+            <Label text="EVACUATION ZONES"
+                   style="-fx-text-fill:#9ca3af; -fx-font-size:11px; -fx-font-weight:bold;"/>
+
+            <TableView fx:id="zonesTable"
+                       VBox.vgrow="ALWAYS"
+                       styleClass="data-table">
+                <columns>
+                    <TableColumn fx:id="colName"        text="Name"       prefWidth="150"/>
+                    <TableColumn fx:id="colLocation"    text="Location"   prefWidth="160"/>
+                    <TableColumn fx:id="colCapacity"    text="Capacity"   prefWidth="80"/>
+                    <TableColumn fx:id="colOccupancy"   text="Occupancy"  prefWidth="90"/>
+                    <TableColumn fx:id="colStatus"      text="Status"     prefWidth="90"/>
+                    <TableColumn fx:id="colReportId"    text="Report #"   prefWidth="80"/>
+                    <TableColumn fx:id="colCreatedAt"   text="Created"    prefWidth="130"/>
+                    <TableColumn fx:id="colAction"      text="Action"     prefWidth="80"/>
+                </columns>
+                <placeholder>
+                    <Label text="No evacuation zones found. Create one using the form."
+                           styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- RIGHT: Create / Update occupancy form -->
+        <VBox styleClass="form-panel" spacing="0" minWidth="300">
+
+            <!-- Form header with tab-like toggle -->
+            <VBox styleClass="form-header" spacing="4">
+                <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+                <Label fx:id="formTitleLabel"
+                       text="Create Evacuation Zone"
+                       styleClass="form-title"/>
+                <HBox spacing="8">
+                    <Button fx:id="btnModeCreate"
+                            text="Create"
+                            styleClass="btn-primary"
+                            onAction="#handleModeCreate"/>
+                    <Button fx:id="btnModeUpdate"
+                            text="Update Occupancy"
+                            styleClass="btn-secondary"
+                            onAction="#handleModeUpdate"/>
+                </HBox>
+            </VBox>
+
+            <!-- Create form -->
+            <VBox fx:id="createFormPane" styleClass="form-body" spacing="16">
+                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                <VBox spacing="6">
+                    <Label text="Zone Name" styleClass="field-label"/>
+                    <TextField fx:id="nameField"
+                               styleClass="field-input"
+                               promptText="e.g. Central Park Shelter"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Location / Address" styleClass="field-label"/>
+                    <TextField fx:id="locationField"
+                               styleClass="field-input"
+                               promptText="e.g. 123 Main St, Springfield"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Capacity (max people)" styleClass="field-label"/>
+                    <TextField fx:id="capacityField"
+                               styleClass="field-input"
+                               promptText="e.g. 500"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Linked Disaster Report" styleClass="field-label"/>
+                    <ComboBox fx:id="reportCombo"
+                              styleClass="field-combo"
+                              maxWidth="Infinity"
+                              promptText="Select a report…"/>
+                </VBox>
+
+                <Label fx:id="createValidationLabel"
+                       styleClass="validation-label"
+                       wrapText="true"
+                       managed="false" visible="false"/>
+
+                <Button fx:id="createBtn"
+                        text="Create Zone"
+                        styleClass="btn-primary"
+                        maxWidth="Infinity"
+                        onAction="#handleCreate"/>
+            </VBox>
+
+            <!-- Update occupancy form (hidden by default) -->
+            <VBox fx:id="updateFormPane" styleClass="form-body" spacing="16"
+                  managed="false" visible="false">
+                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                <Label fx:id="selectedZoneLabel"
+                       text="No zone selected — click 'Select' in the table."
+                       styleClass="section-subtitle"
+                       wrapText="true"/>
+
+                <VBox spacing="6">
+                    <Label text="Current Occupancy" styleClass="field-label"/>
+                    <TextField fx:id="occupancyField"
+                               styleClass="field-input"
+                               promptText="Enter current number of people"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Zone Status" styleClass="field-label"/>
+                    <ComboBox fx:id="statusCombo"
+                              styleClass="field-combo"
+                              maxWidth="Infinity"
+                              promptText="Select status…"/>
+                </VBox>
+
+                <Label fx:id="updateValidationLabel"
+                       styleClass="validation-label"
+                       wrapText="true"
+                       managed="false" visible="false"/>
+
+                <Button fx:id="updateBtn"
+                        text="Update Occupancy"
+                        styleClass="btn-primary"
+                        maxWidth="Infinity"
+                        disable="true"
+                        onAction="#handleUpdate"/>
+            </VBox>
+
+        </VBox>
+
+    </SplitPane>
+
+</VBox>
