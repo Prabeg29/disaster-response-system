@@ -95,6 +95,23 @@ public final class AppService {
         return send(new DrsRequest(DrsRequest.CMD_DEPT_UPDATES_SAVE, u)).getData();
     }
 
+    // ── Evacuation Zones ───────────────────────────────────────────────────
+    public List<EvacuationZone> findAllEvacuationZones() {
+        return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_FIND_ALL)).getData();
+    }
+
+    public List<EvacuationZone> findEvacuationZonesByReport(int reportId) {
+        return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_FIND_BY_REPORT, reportId)).getData();
+    }
+
+    public EvacuationZone saveEvacuationZone(EvacuationZone zone) {
+        return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_SAVE, zone)).getData();
+    }
+
+    public boolean updateEvacuationZoneOccupancy(int id, int occupancy, String status) {
+        return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_UPDATE_OCC, id, occupancy, status)).getData();
+    }
+
     // ── Transport ──────────────────────────────────────────────────────────
     private DrsResponse send(DrsRequest request) {
         try (Socket socket = new Socket(HOST, PORT);

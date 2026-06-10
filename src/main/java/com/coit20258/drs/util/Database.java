@@ -146,7 +146,26 @@ public class Database {
             }
 
             // -----------------------------------------------------------------
-            // 5. disaster_assessments   (depends on users, disaster_reports)
+            // 5. evacuation_zones   (depends on disaster_reports)
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS evacuation_zones ("
+                    + "  id                INT          NOT NULL AUTO_INCREMENT, "
+                    + "  name              VARCHAR(150) NOT NULL, "
+                    + "  location          VARCHAR(255) NOT NULL, "
+                    + "  capacity          INT          NOT NULL DEFAULT 0, "
+                    + "  currentOccupancy  INT          NOT NULL DEFAULT 0, "
+                    + "  status            VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE', "
+                    + "  reportId          INT          NOT NULL, "
+                    + "  createdAt         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "  PRIMARY KEY (id), "
+                    + "  CONSTRAINT fk_evac_report FOREIGN KEY (reportId) "
+                    + "    REFERENCES disaster_reports(id) ON DELETE CASCADE"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
+
+            // -----------------------------------------------------------------
+            // 6. disaster_assessments   (depends on users, disaster_reports)
             // -----------------------------------------------------------------
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS disaster_assessments ("

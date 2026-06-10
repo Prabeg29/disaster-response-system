@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable {
     private final DisasterAssessmentDao assessmentDao = new DisasterAssessmentDaoImpl();
     private final DepartmentDao       departmentDao = new DepartmentDaoImpl();
     private final DepartmentUpdateDao updateDao     = new DepartmentUpdateDaoImpl();
+    private final EvacuationZoneDao   evacZoneDao   = new EvacuationZoneDaoImpl();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -111,6 +112,22 @@ public class ClientHandler implements Runnable {
                     DepartmentUpdate upd = req.arg(0);
                     yield DrsResponse.ok(updateDao.save(upd));
                 }
+
+                // ── Evacuation zones ───────────────────────────────────────
+                case DrsRequest.CMD_EVAC_ZONES_FIND_ALL ->
+                    DrsResponse.ok(evacZoneDao.findAll());
+
+                case DrsRequest.CMD_EVAC_ZONES_FIND_BY_REPORT ->
+                    DrsResponse.ok(evacZoneDao.findByReportId(req.argInt(0)));
+
+                case DrsRequest.CMD_EVAC_ZONES_SAVE -> {
+                    EvacuationZone z = req.arg(0);
+                    yield DrsResponse.ok(evacZoneDao.create(z));
+                }
+
+                case DrsRequest.CMD_EVAC_ZONES_UPDATE_OCC ->
+                    DrsResponse.ok(evacZoneDao.updateOccupancy(
+                            req.argInt(0), req.argInt(1), req.argStr(2)));
 
                 default -> DrsResponse.error("Unknown command: " + req.getCommand());
             };
