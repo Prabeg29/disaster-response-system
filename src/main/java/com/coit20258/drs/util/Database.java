@@ -92,6 +92,83 @@ public class Database {
                     + "    REFERENCES users(id) ON DELETE RESTRICT"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
             );
+
+            // -----------------------------------------------------------------
+            // 3. departments
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS departments ("
+                    + "  id            INT          NOT NULL AUTO_INCREMENT, "
+                    + "  name          VARCHAR(100) NOT NULL UNIQUE, "
+                    + "  contactEmail  VARCHAR(150) NOT NULL, "
+                    + "  contactPhone  VARCHAR(20)  NOT NULL, "
+                    + "  isActive      TINYINT(1)   NOT NULL DEFAULT 1, "
+                    + "  PRIMARY KEY (id)"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
+
+            stmt.executeUpdate(
+                    "INSERT IGNORE INTO departments (name, contactEmail, contactPhone) VALUES "
+                    + "('Fire & Rescue',          'fire@drs.gov',    '000'), "
+                    + "('Medical Services',        'medical@drs.gov', '000'), "
+                    + "('Police & Law Enforcement','police@drs.gov',  '000'), "
+                    + "('Emergency Management',    'emergency@drs.gov','000'), "
+                    + "('Public Works',            'works@drs.gov',   '000'), "
+                    + "('Social Services',         'social@drs.gov',  '000'), "
+                    + "('Environmental Agency',    'env@drs.gov',     '000')"
+            );
+
+            // -----------------------------------------------------------------
+            // 4. department_updates   (depends on users, disaster_reports, departments)
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS department_updates ("
+                    + "  id              INT          NOT NULL AUTO_INCREMENT, "
+                    + "  reportId        INT          NOT NULL, "
+                    + "  departmentId    INT          NOT NULL, "
+                    + "  updatedById     INT          NOT NULL, "
+                    + "  updateText      TEXT         NOT NULL, "
+                    + "  responseStatus  VARCHAR(20)  NOT NULL DEFAULT 'RESPONDING', "
+                    + "  updatedAt       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "  PRIMARY KEY (id), "
+                    + "  CONSTRAINT fk_du_report     FOREIGN KEY (reportId)     REFERENCES disaster_reports(id), "
+                    + "  CONSTRAINT fk_du_department FOREIGN KEY (departmentId) REFERENCES departments(id), "
+                    + "  CONSTRAINT fk_du_user       FOREIGN KEY (updatedById)  REFERENCES users(id)"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
+
+            // Add departmentId column to users if it doesn't exist yet
+            try {
+                stmt.executeUpdate(
+                        "ALTER TABLE users ADD COLUMN departmentId INT NOT NULL DEFAULT 0");
+            } catch (SQLException ignored) {
+                // Column already exists — safe to ignore duplicate column error (1060)
+            }
+
+            // -----------------------------------------------------------------
+            // 5. disaster_assessments   (depends on users, disaster_reports)
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS disaster_assessments ("
+                    + "  id                        INT          NOT NULL AUTO_INCREMENT, "
+                    + "  reportId                  INT          NOT NULL, "
+                    + "  assessorId                INT          NOT NULL, "
+                    + "  assessedSeverity          VARCHAR(20)  NOT NULL, "
+                    + "  estimatedAffected         INT          NOT NULL DEFAULT 0, "
+                    + "  isInfrastructureDamaged   TINYINT(1)   NOT NULL DEFAULT 0, "
+                    + "  isHazardActive            TINYINT(1)   NOT NULL DEFAULT 0, "
+                    + "  priorityScore             INT          NOT NULL DEFAULT 0, "
+                    + "  recommendedActions        TEXT         NULL, "
+                    + "  assignedDepartments       TEXT         NULL, "
+                    + "  assessmentNotes           TEXT         NULL, "
+                    + "  assessedAt                TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "  PRIMARY KEY (id), "
+                    + "  CONSTRAINT fk_assess_report "
+                    + "    FOREIGN KEY (reportId)   REFERENCES disaster_reports(id), "
+                    + "  CONSTRAINT fk_assess_assessor "
+                    + "    FOREIGN KEY (assessorId) REFERENCES users(id)"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
         }
     }
 }

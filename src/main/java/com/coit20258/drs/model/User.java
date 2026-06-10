@@ -1,12 +1,16 @@
 package com.coit20258.drs.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final String ROLE_REPORTER = "REPORTER";
     public static final String ROLE_OPERATOR = "OPERATOR";
     public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_DEPARTMENT = "DEPARTMENT";
 
     private int id;
     private String firstName;
@@ -15,6 +19,7 @@ public class User {
     private String passwordHash;
     private String role;
     private boolean isActive;
+    private int departmentId;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
 
@@ -53,6 +58,30 @@ public class User {
         this.passwordHash = passwordHash;
         this.role = role;
         this.isActive = isActive;
+        this.departmentId = 0;
+        this.createdAt = createdAt;
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    public User(
+            int id,
+            String firstName,
+            String lastName,
+            String email,
+            String passwordHash,
+            String role,
+            boolean isActive,
+            int departmentId,
+            LocalDateTime createdAt,
+            LocalDateTime lastLoginAt) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.isActive = isActive;
+        this.departmentId = departmentId;
         this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
     }
@@ -131,6 +160,14 @@ public class User {
 
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public int getDepartmentId() {
+        return this.departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.coit20258.drs.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class DisasterReport {
+public class DisasterReport implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final String SEVERITY_CRITICAL = "CRITICAL";
     public static final String SEVERITY_HIGH = "HIGH";

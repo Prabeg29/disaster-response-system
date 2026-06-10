@@ -14,10 +14,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
-import com.coit20258.drs.dao.UserDao;
-import com.coit20258.drs.dao.UserDaoImpl;
+import java.util.List;
+
+import com.coit20258.drs.model.Department;
 import com.coit20258.drs.model.User;
+import com.coit20258.drs.service.AppService;
 import com.coit20258.drs.util.Security;
 import com.coit20258.drs.util.SceneManager;
 
@@ -59,32 +62,49 @@ public class RegisterController implements Initializable {
     private Label feedbackLabel;
     @FXML
     private Button registerButton;
+    @FXML
+    private VBox departmentSection;
+    @FXML
+    private ComboBox<Department> departmentCombo;
 
-    private final UserDao userDao = new UserDaoImpl();
+    private final AppService service = AppService.getInstance();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         roleCombo.setItems(FXCollections.observableArrayList(
                 "Reporter",
                 "Operator",
-                "Admin"
+                "Admin",
+                "Department Coordinator"
         ));
         roleCombo.getSelectionModel().selectFirst();
 
-        clearAllErrors();
-
-        // Real-time uniqueness hints — fire on focus-lost to avoid spamming the DB
-        emailField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
-            if (!isFocused) {
-                checkEmailAvailability();
-            }
+        // Show/hide department selector based on role
+        departmentSection.setManaged(false);
+        departmentSection.setVisible(false);
+        roleCombo.valueProperty().addListener((obs, old, val) -> {
+            boolean isDept = "Department Coordinator".equals(val);
+            departmentSection.setManaged(isDept);
+            departmentSection.setVisible(isDept);
         });
 
-        // Live password-match hint
+        // Load departments in background for the combo
+        new Thread(() -> {
+            try {
+                List<Department> depts = service.findAllDepartments();
+                Platform.runLater(() -> departmentCombo.setItems(
+                        FXCollections.observableArrayList(depts)));
+            } catch (Exception ignored) {}
+        }, "load-depts-thread").start();
+
+        clearAllErrors();
+
+        emailField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            if (!isFocused) checkEmailAvailability();
+        });
+
         confirmPasswordField.textProperty().addListener((obs, old, val) -> {
-            if (!val.isEmpty()) {
-                validatePasswordMatch(false);
-            }
+            if (!val.isEmpty()) validatePasswordMatch(false);
         });
     }
 
@@ -102,15 +122,14 @@ public class RegisterController implements Initializable {
 
         new Thread(() -> {
             try {
-                // ── Final uniqueness check on the DB thread ───────────────────
-                boolean emailTaken = userDao.emailExists(emailField.getText().trim());
+                // ── Final uniqueness check via server ─────────────────────────
+                boolean emailTaken = service.emailExists(emailField.getText().trim());
 
                 if (emailTaken) {
                     Platform.runLater(() -> {
                         registerButton.setDisable(false);
                         registerButton.setText("Create Account");
-                        showFieldError(emailError,
-                                "This email is already registered.");
+                        showFieldError(emailError, "This email is already registered.");
                     });
                     return;
                 }
@@ -125,7 +144,13 @@ public class RegisterController implements Initializable {
                         roleConst
                 );
 
-                userDao.register(newUser);
+                // Link to department if registering as Department Coordinator
+                if (User.ROLE_DEPARTMENT.equals(roleConst)) {
+                    Department selected = departmentCombo.getValue();
+                    if (selected != null) newUser.setDepartmentId(selected.getId());
+                }
+
+                service.register(newUser);
 
                 LOGGER.info("New user registered: " + newUser.getEmail());
 
@@ -213,6 +238,13 @@ public class RegisterController implements Initializable {
             ok = false;
         }
 
+        // Department required for Department Coordinator role
+        if ("Department Coordinator".equals(roleCombo.getValue())
+                && departmentCombo.getValue() == null) {
+            showGlobalError("Please select a department.");
+            ok = false;
+        }
+
         return ok;
     }
 
@@ -244,7 +276,7 @@ public class RegisterController implements Initializable {
         }
 
         new Thread(() -> {
-            boolean taken = userDao.emailExists(email);
+            boolean taken = service.emailExists(email);
             Platform.runLater(() -> {
                 if (taken) {
                     showFieldError(emailError, "Email already registered.");
@@ -257,12 +289,10 @@ public class RegisterController implements Initializable {
 
     private String labelToRoleConstant(String label) {
         return switch (label) {
-            case "Operator" ->
-                User.ROLE_OPERATOR;
-            case "Admin" ->
-                User.ROLE_ADMIN;
-            default ->
-                User.ROLE_REPORTER;
+            case "Operator"               -> User.ROLE_OPERATOR;
+            case "Admin"                  -> User.ROLE_ADMIN;
+            case "Department Coordinator" -> User.ROLE_DEPARTMENT;
+            default                       -> User.ROLE_REPORTER;
         };
     }
 

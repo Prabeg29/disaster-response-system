@@ -31,11 +31,11 @@ public class SidebarController implements Initializable {
     @FXML
     private Button navAssessments;
     @FXML
-    private Button navDepartments;
-    @FXML
     private Button navEvacuation;
     @FXML
     private Button navResources;
+    @FXML
+    private Button navDeptCoordination;
 
     /**
      * All nav buttons in display order — used for bulk style reset.
@@ -48,7 +48,7 @@ public class SidebarController implements Initializable {
         // Populated after FXML injection completes
         allNavButtons = List.of(
                 navDashboard, navReports, navAssessments,
-                navDepartments, navEvacuation, navResources
+                navEvacuation, navResources, navDeptCoordination
         );
         populateUserInfo();
     }
@@ -101,11 +101,6 @@ public class SidebarController implements Initializable {
     }
 
     @FXML
-    private void handleNavDepartments() {
-        SceneManager.switchContent("DepartmentView");
-    }
-
-    @FXML
     private void handleNavEvacuation() {
         SceneManager.switchContent("EvacuationZoneView");
     }
@@ -113,6 +108,11 @@ public class SidebarController implements Initializable {
     @FXML
     private void handleNavResources() {
         SceneManager.switchContent("ResourceView");
+    }
+
+    @FXML
+    private void handleNavDeptCoordination() {
+        SceneManager.switchContent("DepartmentCoordinationView");
     }
 
     @FXML
@@ -149,12 +149,12 @@ public class SidebarController implements Initializable {
                 navReports;
             case "DisasterAssessmentView" ->
                 navAssessments;
-            case "DepartmentView" ->
-                navDepartments;
             case "EvacuationZoneView" ->
                 navEvacuation;
             case "ResourceView" ->
                 navResources;
+            case "DepartmentCoordinationView" ->
+                navDeptCoordination;
             default ->
                 null;
         };

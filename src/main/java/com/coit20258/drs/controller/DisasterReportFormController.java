@@ -11,10 +11,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
-import com.coit20258.drs.dao.DisasterReportDao;
-import com.coit20258.drs.dao.DisasterReportDaoImpl;
 import com.coit20258.drs.model.DisasterReport;
 import com.coit20258.drs.model.User;
+import com.coit20258.drs.service.AppService;
 import com.coit20258.drs.util.SceneManager;
 import com.coit20258.drs.util.SessionContext;
 
@@ -52,7 +51,7 @@ public class DisasterReportFormController implements Initializable {
     @FXML
     private Button submitButton;
 
-    private final DisasterReportDao reportDao = new DisasterReportDaoImpl();
+    private final AppService service = AppService.getInstance();
 
     // ── Initialise ─────────────────────────────────────────────────────────
     @Override
@@ -90,7 +89,7 @@ public class DisasterReportFormController implements Initializable {
                         currentUser
                 );
 
-                reportDao.create(report);
+                service.saveReport(report);
                 LOGGER.info("Report saved: id=" + report.getId());
 
                 // Navigate back — list reloads fresh data from DB
