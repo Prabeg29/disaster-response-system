@@ -35,8 +35,11 @@ public class DrsRequest implements Serializable {
     // ── Evacuation zone commands ───────────────────────────────────────────
     public static final String CMD_EVAC_ZONES_FIND_ALL       = "EVAC_ZONES_FIND_ALL";
     public static final String CMD_EVAC_ZONES_FIND_BY_REPORT = "EVAC_ZONES_FIND_BY_REPORT";
+    public static final String CMD_EVAC_ZONES_FIND_BY_ID     = "EVAC_ZONES_FIND_BY_ID";
     public static final String CMD_EVAC_ZONES_SAVE           = "EVAC_ZONES_SAVE";
+    public static final String CMD_EVAC_ZONES_UPDATE         = "EVAC_ZONES_UPDATE";
     public static final String CMD_EVAC_ZONES_UPDATE_OCC     = "EVAC_ZONES_UPDATE_OCC";
+    public static final String CMD_EVAC_ZONES_DELETE         = "EVAC_ZONES_DELETE";
 
     // ── Payload ────────────────────────────────────────────────────────────
     private final String command;
