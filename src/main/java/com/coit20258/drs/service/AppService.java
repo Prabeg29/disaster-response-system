@@ -15,8 +15,12 @@ import com.coit20258.drs.server.DrsServer;
 public final class AppService {
 
     private static final Logger LOGGER   = Logger.getLogger(AppService.class.getName());
-    private static final String HOST     = "localhost";
-    private static final int    PORT     = DrsServer.PORT;
+    private static String host = "localhost";
+    private static int    port = DrsServer.PORT;
+
+    /** Redirect to a stub server during tests — never call in production code. */
+    static void useEndpoint(String h, int p) { host = h; port = p; }
+    static void resetEndpoint()              { host = "localhost"; port = DrsServer.PORT; }
 
     private static final AppService INSTANCE = new AppService();
     private AppService() {}
@@ -153,7 +157,7 @@ public final class AppService {
 
     // ── Transport ──────────────────────────────────────────────────────────
     private DrsResponse send(DrsRequest request) {
-        try (Socket socket = new Socket(HOST, PORT);
+        try (Socket socket = new Socket(host, port);
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream  in  = new ObjectInputStream(socket.getInputStream())) {
 
