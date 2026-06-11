@@ -145,13 +145,6 @@ public class Database {
                 // Column already exists — safe to ignore duplicate column error (1060)
             }
 
-            // Add notes column to evacuation_zones if it doesn't exist yet
-            try {
-                stmt.executeUpdate(
-                        "ALTER TABLE evacuation_zones ADD COLUMN notes TEXT NULL");
-            } catch (SQLException ignored) {
-                // Column already exists — safe to ignore duplicate column error (1060)
-            }
 
             // -----------------------------------------------------------------
             // 7. resources
@@ -190,6 +183,14 @@ public class Database {
                     + "    REFERENCES disaster_reports(id) ON DELETE CASCADE"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
             );
+
+            // Add notes column to evacuation_zones if it doesn't exist yet
+            try {
+                stmt.executeUpdate(
+                        "ALTER TABLE evacuation_zones ADD COLUMN notes TEXT NULL");
+            } catch (SQLException ignored) {
+                // Column already exists — safe to ignore duplicate column error (1060)
+            }
 
             // -----------------------------------------------------------------
             // 6. disaster_assessments   (depends on users, disaster_reports)
