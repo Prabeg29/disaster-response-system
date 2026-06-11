@@ -95,6 +95,32 @@ public final class AppService {
         return send(new DrsRequest(DrsRequest.CMD_DEPT_UPDATES_SAVE, u)).getData();
     }
 
+    // ── Resources ─────────────────────────────────────────────────────────
+    public List<Resource> findAllResources() {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_FIND_ALL)).getData();
+    }
+
+    public List<Resource> findResourcesByType(String resourceType) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_FIND_BY_TYPE, resourceType)).getData();
+    }
+
+    public Optional<Resource> findResourceById(int id) {
+        return Optional.ofNullable(
+                send(new DrsRequest(DrsRequest.CMD_RESOURCES_FIND_BY_ID, id)).getData());
+    }
+
+    public Resource saveResource(Resource resource) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_SAVE, resource)).getData();
+    }
+
+    public boolean updateResource(Resource resource) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_UPDATE, resource)).getData();
+    }
+
+    public boolean deleteResource(int id) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_DELETE, id)).getData();
+    }
+
     // ── Evacuation Zones ───────────────────────────────────────────────────
     public List<EvacuationZone> findAllEvacuationZones() {
         return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_FIND_ALL)).getData();
