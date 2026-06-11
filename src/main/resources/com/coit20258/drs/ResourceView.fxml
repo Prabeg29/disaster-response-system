@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.coit20258.drs.controller.ResourceController">
+
+    <!-- ── Content header ──────────────────────────────────────────────── -->
+    <HBox styleClass="content-header" alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Resource Management"     styleClass="content-header-title"/>
+            <Label text="Track vehicles, equipment, personnel and supplies assigned to disaster responses"
+                   styleClass="content-header-subtitle"/>
+        </VBox>
+        <Button text="Refresh" styleClass="btn-secondary" onAction="#handleRefresh"/>
+    </HBox>
+
+    <!-- ── Banner ──────────────────────────────────────────────────────── -->
+    <Label fx:id="bannerLabel" wrapText="true" managed="false" visible="false"
+           style="-fx-padding:8 28 8 28;"/>
+
+    <!-- ── Main split pane ─────────────────────────────────────────────── -->
+    <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.58">
+
+        <!-- LEFT: table + type filter -->
+        <VBox styleClass="content-body" spacing="10">
+            <padding><Insets top="16" right="12" bottom="16" left="16"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label text="RESOURCES"
+                       style="-fx-text-fill:#9ca3af; -fx-font-size:11px; -fx-font-weight:bold;"
+                       HBox.hgrow="ALWAYS"/>
+                <Label text="Filter:" styleClass="field-label"/>
+                <ComboBox fx:id="filterCombo" styleClass="field-combo"
+                          prefWidth="140" promptText="All Types"/>
+            </HBox>
+
+            <TableView fx:id="resourcesTable" VBox.vgrow="ALWAYS" styleClass="data-table">
+                <columns>
+                    <TableColumn fx:id="colName"      text="Name"      prefWidth="130"/>
+                    <TableColumn fx:id="colType"      text="Type"      prefWidth="90"/>
+                    <TableColumn fx:id="colTotal"     text="Total"     prefWidth="60"/>
+                    <TableColumn fx:id="colAvailable" text="Available" prefWidth="75"/>
+                    <TableColumn fx:id="colStatus"    text="Status"    prefWidth="90"/>
+                    <TableColumn fx:id="colReportId"  text="Report #"  prefWidth="70"/>
+                    <TableColumn fx:id="colUpdatedAt" text="Updated"   prefWidth="120"/>
+                    <TableColumn fx:id="colAction"    text="Actions"   prefWidth="120"/>
+                </columns>
+                <placeholder>
+                    <Label text="No resources found. Add one using the form."
+                           styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- RIGHT: Create / Edit form -->
+        <VBox styleClass="form-panel" spacing="0" minWidth="300">
+
+            <!-- Form header -->
+            <VBox styleClass="form-header" spacing="4">
+                <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+                <Label fx:id="formTitleLabel" text="Add Resource" styleClass="form-title"/>
+                <HBox spacing="8">
+                    <Button fx:id="btnModeCreate" text="Add"  styleClass="btn-primary"
+                            onAction="#handleModeCreate"/>
+                    <Button fx:id="btnModeEdit"   text="Edit" styleClass="btn-secondary"
+                            onAction="#handleModeEdit"/>
+                </HBox>
+            </VBox>
+
+            <!-- Create form -->
+            <ScrollPane fx:id="createScrollPane" fitToWidth="true"
+                        VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+                <VBox fx:id="createFormPane" styleClass="form-body" spacing="16">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                    <VBox spacing="6">
+                        <Label text="Name" styleClass="field-label"/>
+                        <TextField fx:id="nameField" styleClass="field-input"
+                                   promptText="e.g. Fire Engine 3"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Resource Type" styleClass="field-label"/>
+                        <ComboBox fx:id="typeCombo" styleClass="field-combo"
+                                  maxWidth="Infinity" promptText="Select type…"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Total Quantity" styleClass="field-label"/>
+                        <TextField fx:id="totalField" styleClass="field-input" promptText="e.g. 10"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Available Quantity" styleClass="field-label"/>
+                        <TextField fx:id="availableField" styleClass="field-input" promptText="e.g. 8"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Status" styleClass="field-label"/>
+                        <ComboBox fx:id="statusCombo" styleClass="field-combo"
+                                  maxWidth="Infinity" promptText="Select status…"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Assigned Report (optional)" styleClass="field-label"/>
+                        <ComboBox fx:id="reportCombo" styleClass="field-combo"
+                                  maxWidth="Infinity" promptText="None"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Notes (optional)" styleClass="field-label"/>
+                        <TextArea fx:id="notesArea" styleClass="field-textarea"
+                                  promptText="Any additional information…"
+                                  prefRowCount="3" wrapText="true"/>
+                    </VBox>
+
+                    <Label fx:id="createValidationLabel" styleClass="validation-label"
+                           wrapText="true" managed="false" visible="false"/>
+
+                    <Button fx:id="createBtn" text="Add Resource" styleClass="btn-primary"
+                            maxWidth="Infinity" onAction="#handleCreate"/>
+                </VBox>
+            </ScrollPane>
+
+            <!-- Edit form (hidden by default) -->
+            <ScrollPane fx:id="editScrollPane" fitToWidth="true"
+                        VBox.vgrow="ALWAYS" styleClass="scroll-pane"
+                        managed="false" visible="false">
+                <VBox fx:id="editFormPane" styleClass="form-body" spacing="16">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                    <Label fx:id="editResourceLabel"
+                           text="No resource selected — click Edit in the table."
+                           styleClass="section-subtitle" wrapText="true"/>
+
+                    <VBox spacing="6">
+                        <Label text="Name" styleClass="field-label"/>
+                        <TextField fx:id="editNameField" styleClass="field-input"
+                                   promptText="e.g. Fire Engine 3"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Resource Type" styleClass="field-label"/>
+                        <ComboBox fx:id="editTypeCombo" styleClass="field-combo"
+                                  maxWidth="Infinity" promptText="Select type…"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Total Quantity" styleClass="field-label"/>
+                        <TextField fx:id="editTotalField" styleClass="field-input" promptText="e.g. 10"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Available Quantity" styleClass="field-label"/>
+                        <TextField fx:id="editAvailableField" styleClass="field-input" promptText="e.g. 8"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Status" styleClass="field-label"/>
+                        <ComboBox fx:id="editStatusCombo" styleClass="field-combo"
+                                  maxWidth="Infinity" promptText="Select status…"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Assigned Report (optional)" styleClass="field-label"/>
+                        <ComboBox fx:id="editReportCombo" styleClass="field-combo"
+                                  maxWidth="Infinity" promptText="None"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Notes (optional)" styleClass="field-label"/>
+                        <TextArea fx:id="editNotesArea" styleClass="field-textarea"
+                                  promptText="Any additional information…"
+                                  prefRowCount="3" wrapText="true"/>
+                    </VBox>
+
+                    <Label fx:id="editValidationLabel" styleClass="validation-label"
+                           wrapText="true" managed="false" visible="false"/>
+
+                    <Button fx:id="editBtn" text="Save Changes" styleClass="btn-primary"
+                            maxWidth="Infinity" onAction="#handleEditSave"/>
+                </VBox>
+            </ScrollPane>
+
+        </VBox>
+
+    </SplitPane>
+
+</VBox>
