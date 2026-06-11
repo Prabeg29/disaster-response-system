@@ -97,7 +97,7 @@ public class SidebarController implements Initializable {
 
     @FXML
     private void handleNavAssessments() {
-        SceneManager.switchContent("DisasterAssessmentView");
+        SceneManager.switchContent("DisasterAssessmentListView");
     }
 
     @FXML
@@ -147,7 +147,7 @@ public class SidebarController implements Initializable {
             // Both list and form keep "Reports" highlighted
             case "DisasterReportListView", "DisasterReportFormView" ->
                 navReports;
-            case "DisasterAssessmentView" ->
+            case "DisasterAssessmentListView", "DisasterAssessmentView" ->
                 navAssessments;
             case "EvacuationZoneView" ->
                 navEvacuation;
