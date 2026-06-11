@@ -104,12 +104,25 @@ public final class AppService {
         return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_FIND_BY_REPORT, reportId)).getData();
     }
 
+    public Optional<EvacuationZone> findEvacuationZoneById(int id) {
+        return Optional.ofNullable(
+                send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_FIND_BY_ID, id)).getData());
+    }
+
     public EvacuationZone saveEvacuationZone(EvacuationZone zone) {
         return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_SAVE, zone)).getData();
     }
 
+    public boolean updateEvacuationZone(EvacuationZone zone) {
+        return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_UPDATE, zone)).getData();
+    }
+
     public boolean updateEvacuationZoneOccupancy(int id, int occupancy, String status) {
         return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_UPDATE_OCC, id, occupancy, status)).getData();
+    }
+
+    public boolean deleteEvacuationZone(int id) {
+        return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_DELETE, id)).getData();
     }
 
     // ── Transport ──────────────────────────────────────────────────────────
