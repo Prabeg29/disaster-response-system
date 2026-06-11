@@ -1,0 +1,52 @@
+@startuml ClassDiagram_DRS
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultTextAlignment left
+skinparam RectangleFontStyle bold
+skinparam ArrowFontSize 11
+skinparam ArrowColor black
+skinparam RectangleBorderColor black
+skinparam DatabaseBorderColor black
+skinparam DatabaseFontStyle bold
+
+title Class Diagram — MVC Client/Server Architecture
+
+' ─────────────────────────────────────────────────────────────────
+' Nodes
+' ─────────────────────────────────────────────────────────────────
+
+rectangle "**Drs**\n───────────────────\n+ main(args)\nStarts DrsServer thread\nLaunches SceneManager" as entry
+
+rectangle "**JavaFX Controllers**\n───────────────────────────\nLoginController\nRegisterController\nDashboardController\nDisasterReport{List,Form}Controller\nDisasterAssessment{List,}Controller\nEvacuationZoneController\nResourceController\nDepartmentCoordinationController\nAppShellController · SidebarController" as ctrl
+
+rectangle "**AppService**\n───────────────────────────\nSingleton TCP Client\nOne new socket per request\nOne method per CMD_* command" as svc
+
+rectangle "**Protocol**\n───────────────────────────\nDrsRequest\n  + command : String\n  + args : Object[]\n  + CMD_* string constants\nDrsResponse\n  + data : Object\n  + success : boolean\n  + errorMessage : String" as proto
+
+rectangle "**Server**\n───────────────────────────\nDrsServer\n  Daemon thread · port 9090\n  Fixed thread pool (size 10)\nClientHandler\n  Runnable · one per connection\n  Switch-dispatches on CMD_*" as server
+
+rectangle "**DAO Layer**\n───────────────────────────\nUserDaoImpl\nDisasterReportDaoImpl\nDisasterAssessmentDaoImpl\nDepartmentDaoImpl\nDepartmentUpdateDaoImpl\nEvacuationZoneDaoImpl\nResourceDaoImpl" as dao
+
+rectangle "**Model Classes**\n───────────────────────────\nUser\nDisasterReport\nDisasterAssessment\nDepartment\nDepartmentUpdate\nEvacuationZone\nResource" as models
+
+rectangle "**Utilities**\n───────────────────────────\nDatabase  (JDBC pool + DDL)\nSceneManager  (view lifecycle)\nSessionContext  (logged-in user)\nSecurity  (SHA-256 hashing)" as utils
+
+database "**MySQL Database  (drs_db)**\n───────────────────────────\nusers\ndisaster_reports\ndisaster_assessments\ndepartments\ndepartment_updates\nevacuation_zones\nresources" as db
+
+' ─────────────────────────────────────────────────────────────────
+' Relationships
+' ─────────────────────────────────────────────────────────────────
+
+entry  -right->  ctrl    : launches
+ctrl   -right->  svc     : calls
+svc    -right->  proto   : creates
+proto  -down->   server  : sent to
+server -down->   dao     : routes
+dao    -right->  models  : returns
+dao    -down->   db      : stores\n(JDBC)
+ctrl   ..>       utils   : uses
+svc    ..>       utils   : uses
+
+@enduml

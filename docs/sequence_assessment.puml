@@ -1,0 +1,108 @@
+@startuml Sequence_Assessment
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor black
+skinparam sequenceLifeLineBorderColor black
+skinparam sequenceBoxBorderColor black
+skinparam noteBorderColor black
+skinparam noteBackgroundColor white
+
+title Sequence Diagram 3 — Assess Disaster Report
+
+actor "User" as user
+participant "DisasterAssessment\nController" as ac
+participant "AppService" as svc
+participant "DrsServer\n(TCP :9090)" as server
+participant "ClientHandler" as handler
+participant "DisasterAssessment\nDaoImpl" as dao
+database "MySQL" as db
+
+user -> ac : opens assessment form\nfor a selected report
+
+activate ac
+
+ac -> svc : findAssessmentByReport(reportId)
+activate svc
+svc -> server : CMD_ASSESSMENTS_FIND_BY_REPORT
+activate server
+server -> handler : dispatch
+activate handler
+handler -> dao : findByReportId(reportId)
+activate dao
+dao -> db : SELECT * FROM disaster_assessments\nWHERE reportId = ?
+activate db
+db --> dao : ResultSet
+deactivate db
+dao --> handler : Optional<DisasterAssessment>
+deactivate dao
+handler --> server : DrsResponse
+deactivate handler
+server --> svc : DrsResponse
+deactivate server
+svc --> ac : Optional<DisasterAssessment>
+deactivate svc
+
+alt assessment already exists
+    ac -> ac : pre-fill all form fields\nfrom existing assessment
+    note right of ac : form is in "update" mode
+else no prior assessment
+    note right of ac : form is in "create" mode
+end
+
+loop user adjusts severity / affected count / flags
+    ac -> ac : computePriorityScore()\nupdate priorityScoreLabel in real time
+end
+
+user -> ac : clicks Submit
+
+ac -> ac : validateForm()\n(all fields required,\n≥1 action, ≥1 department)
+
+alt validation fails
+    ac --> user : show validationLabel error
+else valid
+    ac -> svc : saveAssessment(assessment)\n  OR  updateAssessment(assessment)\n[background Thread]
+    activate svc
+
+    svc -> svc : new DrsRequest\n(CMD_ASSESSMENTS_SAVE\nor CMD_ASSESSMENTS_UPDATE, assessment)
+    svc -> server : open Socket\nserialise DrsRequest
+    activate server
+    server -> handler : dispatch
+    activate handler
+
+    alt saving new assessment
+        handler -> dao : save(assessment)
+        activate dao
+        dao -> db : INSERT INTO disaster_assessments (...)
+        activate db
+        db --> dao : generated id
+        deactivate db
+        dao --> handler : DisasterAssessment (with id)
+        deactivate dao
+    else updating existing
+        handler -> dao : update(assessment)
+        activate dao
+        dao -> db : UPDATE disaster_assessments\nSET ... WHERE id = ?
+        activate db
+        db --> dao : rows affected
+        deactivate db
+        dao --> handler : boolean true
+        deactivate dao
+    end
+
+    handler --> server : DrsResponse
+    deactivate handler
+    server --> svc : DrsResponse
+    deactivate server
+    svc --> ac : result
+    deactivate svc
+
+    ac -> ac : Platform.runLater:\nSceneManager.switchContent\n("DisasterReportListView")
+    ac --> user : navigates back to report list
+end
+
+deactivate ac
+
+@enduml

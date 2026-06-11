@@ -1,0 +1,44 @@
+@startuml DRS_Architecture
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultTextAlignment center
+skinparam RectangleFontStyle bold
+skinparam ArrowFontSize 11
+
+title DRS-Enhanced — System Architecture
+
+' ── Tier 1: Presentation ──────────────────────────────────────────
+rectangle "JavaFX Presentation Layer" as T1 {
+    rectangle "Controllers" as controllers {
+        rectangle "LoginController  ·  RegisterController" as auth
+        rectangle "DashboardController\nDisasterReport{List,Form}Controller\nDisasterAssessment{List,}Controller\nEvacuationZoneController  ·  ResourceController\nDepartmentCoordinationController" as views
+    }
+}
+
+' ── AppService ────────────────────────────────────────────────────
+rectangle "AppService  (Singleton TCP Client)" as appservice
+
+' ── Tier 2: Server ───────────────────────────────────────────────
+rectangle "TCP Server Layer" as T2 {
+    rectangle "DrsServer\n(daemon thread · port 9090 · pool size: 10)" as server
+
+    rectangle "ClientHandler\n(Runnable · one per connection)\ndispatches on CMD_* constants" as handler
+
+    rectangle "DAO Layer\nUserDaoImpl · DisasterReportDaoImpl · DisasterAssessmentDaoImpl\nDepartmentDaoImpl · DepartmentUpdateDaoImpl\nEvacuationZoneDaoImpl · ResourceDaoImpl" as daos
+}
+
+' ── Tier 3: Database ─────────────────────────────────────────────
+database "MySQL 8  —  drs_db\nusers · disaster_reports · disaster_assessments\ndepartments · department_updates\nevacuation_zones · resources" as db
+
+' ── Flow ─────────────────────────────────────────────────────────
+controllers  -down->  appservice  : controller calls\nAppService method
+appservice   -down->  server      : DrsRequest\n(Java Object Serialisation\nTCP localhost:9090)
+server       -down->  handler     : accept() →\npool.execute()
+handler      -down->  daos        : switch on CMD_*\n→ DAO method
+daos         -down->  db          : JDBC\nPreparedStatement
+
+server       -up->    appservice  : DrsResponse\n(serialised result)
+
+@enduml

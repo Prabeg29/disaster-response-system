@@ -130,6 +130,33 @@ public class SidebarController implements Initializable {
         navUserName.setText(u.getFullName());
         navUserRole.setText(u.getRole());
         navUserEmail.setText(u.getEmail());
+        applyRoleAccess(u.getRole());
+    }
+
+    private void applyRoleAccess(String role) {
+        // Start with all buttons visible, then hide what this role cannot access
+        for (Button btn : allNavButtons) {
+            btn.setVisible(true);
+            btn.setManaged(true);
+        }
+        switch (role) {
+            case "DEPARTMENT" -> {
+                // Only department coordination is accessible
+                setHidden(navDashboard, navReports, navAssessments, navEvacuation, navResources);
+            }
+            case "REPORTER" -> {
+                // Cannot access assessments, dashboard, or dept coordination
+                setHidden(navAssessments, navDashboard, navDeptCoordination);
+            }
+            // OPERATOR and ADMIN get full access — nothing to hide
+        }
+    }
+
+    private void setHidden(Button... buttons) {
+        for (Button btn : buttons) {
+            btn.setVisible(false);
+            btn.setManaged(false);
+        }
     }
 
     /**

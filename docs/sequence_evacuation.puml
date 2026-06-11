@@ -1,0 +1,80 @@
+@startuml Sequence_EvacuationOccupancy
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor black
+skinparam sequenceLifeLineBorderColor black
+skinparam sequenceBoxBorderColor black
+skinparam noteBorderColor black
+skinparam noteBackgroundColor white
+
+title Sequence Diagram 4 — Update Evacuation Zone Occupancy
+
+actor "User" as user
+participant "EvacuationZone\nController" as ec
+participant "AppService" as svc
+participant "DrsServer\n(TCP :9090)" as server
+participant "ClientHandler" as handler
+participant "EvacuationZone\nDaoImpl" as dao
+database "MySQL" as db
+
+user -> ec : clicks "Update" mode button\nselects zone from table
+
+activate ec
+ec -> ec : populate selectedZoneLabel\nwith selected zone name
+ec -> ec : show Update form panel\n(occupancyField, statusCombo)
+
+user -> ec : enters new occupancy value\nselects status (ACTIVE / FULL / CLOSED)\nclicks Update
+
+ec -> ec : validate:\n occupancy ≥ 0\n occupancy ≤ zone.capacity
+
+alt validation fails
+    ec --> user : show inline validation error
+else valid
+    ec -> svc : updateEvacuationZoneOccupancy\n(zoneId, occupancy, status)\n[background Thread]
+    activate svc
+
+    svc -> svc : new DrsRequest\n(CMD_EVAC_ZONES_UPDATE_OCC,\n zoneId, occupancy, status)
+    svc -> server : open Socket\nserialise DrsRequest
+    activate server
+
+    server -> handler : accept() →\npool.execute(ClientHandler)
+    activate handler
+
+    handler -> handler : deserialise DrsRequest\ncommand = CMD_EVAC_ZONES_UPDATE_OCC
+
+    handler -> dao : updateOccupancy\n(zoneId, occupancy, status)
+    activate dao
+
+    dao -> db : UPDATE evacuation_zones\nSET currentOccupancy = ?,\n    status = ?\nWHERE id = ?
+    activate db
+    db --> dao : rows affected (1)
+    deactivate db
+
+    dao --> handler : boolean true
+    deactivate dao
+
+    handler -> handler : wrap in\nDrsResponse(success=true, data=true)
+    handler --> server : serialise DrsResponse
+    deactivate handler
+
+    server --> svc : deserialise DrsResponse
+    deactivate server
+
+    svc --> ec : true
+    deactivate svc
+
+    ec -> svc : findAllEvacuationZones()\n(reload table data)
+    activate svc
+    svc --> ec : List<EvacuationZone>
+    deactivate svc
+
+    ec -> ec : Platform.runLater:\nrefresh table\nshow success banner
+    ec --> user : table updated with\nnew occupancy and status
+end
+
+deactivate ec
+
+@enduml

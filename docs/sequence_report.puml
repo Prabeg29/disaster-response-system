@@ -1,0 +1,75 @@
+@startuml Sequence_SubmitReport
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor black
+skinparam sequenceLifeLineBorderColor black
+skinparam sequenceBoxBorderColor black
+skinparam noteBorderColor black
+skinparam noteBackgroundColor white
+
+title Sequence Diagram 2 — Submit Disaster Report
+
+actor "User" as user
+participant "DisasterReportForm\nController" as fc
+participant "AppService" as svc
+participant "DrsServer\n(TCP :9090)" as server
+participant "ClientHandler" as handler
+participant "DisasterReportDao\nImpl" as dao
+database "MySQL" as db
+
+user -> fc : fills form\n(type, location, severity, description)\nclicks Submit
+
+activate fc
+fc -> fc : validateForm()\ncheck all fields present
+
+alt validation fails
+    fc --> user : show inline field errors
+else validation passes
+    fc -> fc : submitButton.setDisable(true)\n[new background Thread]
+
+    fc -> fc : new DisasterReport\n(type, location, severity,\ndescription, currentUser)
+
+    fc -> svc : saveReport(report)
+    activate svc
+
+    svc -> svc : new DrsRequest\n(CMD_REPORTS_SAVE, report)
+    svc -> server : open Socket\nserialise DrsRequest
+    activate server
+
+    server -> handler : accept() →\npool.execute(ClientHandler)
+    activate handler
+
+    handler -> handler : deserialise DrsRequest\ncommand = CMD_REPORTS_SAVE
+
+    handler -> dao : create(report)
+    activate dao
+
+    dao -> db : INSERT INTO disaster_reports\n(disasterType, location,\nseverityLevel, description,\nstatus, reportedById, reportedAt)
+    activate db
+    db --> dao : generated key (auto-increment id)
+    deactivate db
+
+    dao -> dao : report.setId(generatedKey)
+    dao --> handler : DisasterReport (with id)
+    deactivate dao
+
+    handler -> handler : wrap in DrsResponse\n(success=true, data=report)
+    handler --> server : serialise DrsResponse
+    deactivate handler
+
+    server --> svc : deserialise DrsResponse
+    deactivate server
+
+    svc --> fc : saved DisasterReport
+    deactivate svc
+
+    fc -> fc : Platform.runLater:\nSceneManager.switchContent\n("DisasterReportListView")
+    fc --> user : navigates to report list\n(new controller instance loads\nfresh data automatically)
+end
+
+deactivate fc
+
+@enduml

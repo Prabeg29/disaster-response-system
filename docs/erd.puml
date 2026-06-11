@@ -1,0 +1,114 @@
+@startuml ERD_DRS
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam EntityBorderColor black
+skinparam EntityFontStyle bold
+skinparam ArrowColor black
+skinparam linetype ortho
+
+title Entity Relationship Diagram — drs_db
+
+entity "users" {
+  * id : INT <<PK>>
+  --
+  firstName : VARCHAR(50)
+  lastName : VARCHAR(50)
+  * email : VARCHAR(150) <<UNIQUE>>
+  * passwordHash : VARCHAR(255)
+  * role : VARCHAR(255)
+  * isActive : TINYINT(1)
+  departmentId : INT
+  * createdAt : TIMESTAMP
+  lastLoginAt : TIMESTAMP
+}
+
+entity "departments" {
+  * id : INT <<PK>>
+  --
+  * name : VARCHAR(100) <<UNIQUE>>
+  * contactEmail : VARCHAR(150)
+  * contactPhone : VARCHAR(20)
+  * isActive : TINYINT(1)
+}
+
+entity "disaster_reports" {
+  * id : INT <<PK>>
+  --
+  * disasterType : VARCHAR(100)
+  * location : VARCHAR(255)
+  * severityLevel : VARCHAR(20)
+  description : TEXT
+  * status : VARCHAR(50)
+  * reportedById : INT <<FK>>
+  * reportedAt : TIMESTAMP
+}
+
+entity "disaster_assessments" {
+  * id : INT <<PK>>
+  --
+  * reportId : INT <<FK>>
+  * assessorId : INT <<FK>>
+  * assessedSeverity : VARCHAR(20)
+  * estimatedAffected : INT
+  * isInfrastructureDamaged : TINYINT(1)
+  * isHazardActive : TINYINT(1)
+  * priorityScore : INT
+  recommendedActions : TEXT
+  assignedDepartments : TEXT
+  assessmentNotes : TEXT
+  * assessedAt : TIMESTAMP
+}
+
+entity "department_updates" {
+  * id : INT <<PK>>
+  --
+  * reportId : INT <<FK>>
+  * departmentId : INT <<FK>>
+  * updatedById : INT <<FK>>
+  * updateText : TEXT
+  * responseStatus : VARCHAR(20)
+  * updatedAt : TIMESTAMP
+}
+
+entity "evacuation_zones" {
+  * id : INT <<PK>>
+  --
+  * name : VARCHAR(150)
+  * location : VARCHAR(255)
+  * capacity : INT
+  * currentOccupancy : INT
+  * status : VARCHAR(20)
+  * reportId : INT <<FK>>
+  notes : TEXT
+  * createdAt : TIMESTAMP
+}
+
+entity "resources" {
+  * id : INT <<PK>>
+  --
+  * name : VARCHAR(150)
+  * resourceType : VARCHAR(50)
+  * totalQuantity : INT
+  * availableQuantity : INT
+  * status : VARCHAR(20)
+  assignedReportId : INT
+  notes : TEXT
+  * updatedAt : TIMESTAMP
+}
+
+' ── Relationships ────────────────────────────────────────────────
+
+users                ||--o{ disaster_reports    : "reportedById"
+users                ||--o{ disaster_assessments : "assessorId"
+users                ||--o{ department_updates   : "updatedById"
+
+disaster_reports     ||--o| disaster_assessments : "reportId\n(one-to-one\nby business rule)"
+disaster_reports     ||--o{ department_updates   : "reportId"
+disaster_reports     ||--o{ evacuation_zones     : "reportId\n(ON DELETE CASCADE)"
+disaster_reports     ..o{ resources              : "assignedReportId\n(soft reference,\nno FK constraint)"
+
+departments          ||--o{ department_updates   : "departmentId"
+
+@enduml
