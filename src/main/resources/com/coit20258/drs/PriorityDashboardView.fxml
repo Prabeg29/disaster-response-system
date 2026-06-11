@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.coit20258.drs.controller.DashboardController">
+
+    <!-- ── Content header ──────────────────────────────────────────────── -->
+    <HBox styleClass="content-header" alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Priority Dashboard"      styleClass="content-header-title"/>
+            <Label text="Live overview of active reports and highest-priority assessments"
+                   styleClass="content-header-subtitle"/>
+        </VBox>
+        <Button text="Refresh" styleClass="btn-secondary" onAction="#handleRefresh"/>
+    </HBox>
+
+    <!-- ── Banner ──────────────────────────────────────────────────────── -->
+    <Label fx:id="bannerLabel" wrapText="true" managed="false" visible="false"
+           style="-fx-padding:8 28 8 28;"/>
+
+    <!-- ── Stat cards ──────────────────────────────────────────────────── -->
+    <HBox spacing="16" style="-fx-padding:16 28 8 28;">
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="4">
+            <Label text="TOTAL REPORTS" styleClass="stat-card-label"/>
+            <Label fx:id="totalLabel" text="—" styleClass="stat-card-value"/>
+        </VBox>
+        <VBox styleClass="stat-card, stat-card-critical" HBox.hgrow="ALWAYS" spacing="4">
+            <Label text="CRITICAL" styleClass="stat-card-label"/>
+            <Label fx:id="criticalLabel" text="—" styleClass="stat-card-value"
+                   style="-fx-text-fill:#c0392b;"/>
+        </VBox>
+        <VBox styleClass="stat-card, stat-card-high" HBox.hgrow="ALWAYS" spacing="4">
+            <Label text="HIGH SEVERITY" styleClass="stat-card-label"/>
+            <Label fx:id="highLabel" text="—" styleClass="stat-card-value"
+                   style="-fx-text-fill:#e67e22;"/>
+        </VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="4">
+            <Label text="RESOLVED" styleClass="stat-card-label"/>
+            <Label fx:id="resolvedLabel" text="—" styleClass="stat-card-value"
+                   style="-fx-text-fill:#27ae60;"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Priority table ──────────────────────────────────────────────── -->
+    <VBox VBox.vgrow="ALWAYS" styleClass="content-body" spacing="10">
+        <padding><Insets top="16" right="28" bottom="16" left="28"/></padding>
+
+        <Label text="TOP PRIORITY ASSESSMENTS"
+               style="-fx-text-fill:#9ca3af; -fx-font-size:11px; -fx-font-weight:bold;"/>
+
+        <TableView fx:id="priorityTable" VBox.vgrow="ALWAYS" styleClass="data-table">
+            <columns>
+                <TableColumn fx:id="colScore"      text="Score"      prefWidth="70"/>
+                <TableColumn fx:id="colType"       text="Type"       prefWidth="120"/>
+                <TableColumn fx:id="colLocation"   text="Location"   prefWidth="180"/>
+                <TableColumn fx:id="colSeverity"   text="Severity"   prefWidth="90"/>
+                <TableColumn fx:id="colAssessedBy" text="Assessed By" prefWidth="140"/>
+                <TableColumn fx:id="colAssessedAt" text="Assessed At" prefWidth="140"/>
+            </columns>
+            <placeholder>
+                <Label text="No assessments yet. Assess a disaster report to populate this table."
+                       styleClass="table-placeholder"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+
+</VBox>
