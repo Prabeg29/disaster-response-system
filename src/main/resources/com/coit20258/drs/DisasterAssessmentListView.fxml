@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.coit20258.drs.controller.DisasterAssessmentListController">
+
+    <!-- ── Content header ──────────────────────────────────────────────── -->
+    <HBox styleClass="content-header" alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Disaster Assessments"    styleClass="content-header-title"/>
+            <Label text="Review all assessments and open the assessment form for any report"
+                   styleClass="content-header-subtitle"/>
+        </VBox>
+        <Button text="Refresh" styleClass="btn-secondary" onAction="#handleRefresh"/>
+    </HBox>
+
+    <!-- ── Banner ──────────────────────────────────────────────────────── -->
+    <Label fx:id="bannerLabel" wrapText="true" managed="false" visible="false"
+           style="-fx-padding:8 28 8 28;"/>
+
+    <!-- ── Table ───────────────────────────────────────────────────────── -->
+    <VBox VBox.vgrow="ALWAYS" styleClass="content-body">
+        <TableView fx:id="assessmentsTable" VBox.vgrow="ALWAYS" styleClass="data-table">
+            <columns>
+                <TableColumn fx:id="colReportId"   text="Report #"   prefWidth="80"/>
+                <TableColumn fx:id="colType"       text="Type"       prefWidth="120"/>
+                <TableColumn fx:id="colLocation"   text="Location"   prefWidth="170"/>
+                <TableColumn fx:id="colSeverity"   text="Severity"   prefWidth="90"/>
+                <TableColumn fx:id="colScore"      text="Score"      prefWidth="70"/>
+                <TableColumn fx:id="colAssessedBy" text="Assessed By" prefWidth="140"/>
+                <TableColumn fx:id="colAssessedAt" text="Assessed At" prefWidth="140"/>
+                <TableColumn fx:id="colAction"     text="Action"     prefWidth="100"/>
+            </columns>
+            <placeholder>
+                <Label text="No assessments yet. Use the Disaster Reports view to assess a report."
+                       styleClass="table-placeholder"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+
+</VBox>

@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 
 import com.coit20258.drs.dao.*;
 import com.coit20258.drs.model.*;
+import com.coit20258.drs.dao.ResourceDao;
+import com.coit20258.drs.dao.ResourceDaoImpl;
 
 public class ClientHandler implements Runnable {
 
@@ -21,6 +23,7 @@ public class ClientHandler implements Runnable {
     private final DepartmentDao       departmentDao = new DepartmentDaoImpl();
     private final DepartmentUpdateDao updateDao     = new DepartmentUpdateDaoImpl();
     private final EvacuationZoneDao   evacZoneDao   = new EvacuationZoneDaoImpl();
+    private final ResourceDao         resourceDao   = new ResourceDaoImpl();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -139,6 +142,29 @@ public class ClientHandler implements Runnable {
 
                 case DrsRequest.CMD_EVAC_ZONES_DELETE ->
                     DrsResponse.ok(evacZoneDao.delete(req.argInt(0)));
+
+                // ── Resources ──────────────────────────────────────────────
+                case DrsRequest.CMD_RESOURCES_FIND_ALL ->
+                    DrsResponse.ok(resourceDao.findAll());
+
+                case DrsRequest.CMD_RESOURCES_FIND_BY_TYPE ->
+                    DrsResponse.ok(resourceDao.findByType(req.argStr(0)));
+
+                case DrsRequest.CMD_RESOURCES_FIND_BY_ID ->
+                    DrsResponse.ok(resourceDao.findById(req.argInt(0)).orElse(null));
+
+                case DrsRequest.CMD_RESOURCES_SAVE -> {
+                    Resource res = req.arg(0);
+                    yield DrsResponse.ok(resourceDao.create(res));
+                }
+
+                case DrsRequest.CMD_RESOURCES_UPDATE -> {
+                    Resource res = req.arg(0);
+                    yield DrsResponse.ok(resourceDao.update(res));
+                }
+
+                case DrsRequest.CMD_RESOURCES_DELETE ->
+                    DrsResponse.ok(resourceDao.delete(req.argInt(0)));
 
                 default -> DrsResponse.error("Unknown command: " + req.getCommand());
             };

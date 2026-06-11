@@ -154,6 +154,25 @@ public class Database {
             }
 
             // -----------------------------------------------------------------
+            // 7. resources
+            // -----------------------------------------------------------------
+            stmt.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS resources ("
+                    + "  id                INT          NOT NULL AUTO_INCREMENT, "
+                    + "  name              VARCHAR(150) NOT NULL, "
+                    + "  resourceType      VARCHAR(50)  NOT NULL, "
+                    + "  totalQuantity     INT          NOT NULL DEFAULT 0, "
+                    + "  availableQuantity INT          NOT NULL DEFAULT 0, "
+                    + "  status            VARCHAR(20)  NOT NULL DEFAULT 'AVAILABLE', "
+                    + "  assignedReportId  INT          NOT NULL DEFAULT 0, "
+                    + "  notes             TEXT         NULL, "
+                    + "  updatedAt         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP "
+                    + "                    ON UPDATE CURRENT_TIMESTAMP, "
+                    + "  PRIMARY KEY (id)"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
+
+            // -----------------------------------------------------------------
             // 5. evacuation_zones   (depends on disaster_reports)
             // -----------------------------------------------------------------
             stmt.executeUpdate(

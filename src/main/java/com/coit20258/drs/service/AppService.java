@@ -15,8 +15,12 @@ import com.coit20258.drs.server.DrsServer;
 public final class AppService {
 
     private static final Logger LOGGER   = Logger.getLogger(AppService.class.getName());
-    private static final String HOST     = "localhost";
-    private static final int    PORT     = DrsServer.PORT;
+    private static String host = "localhost";
+    private static int    port = DrsServer.PORT;
+
+    /** Redirect to a stub server during tests — never call in production code. */
+    static void useEndpoint(String h, int p) { host = h; port = p; }
+    static void resetEndpoint()              { host = "localhost"; port = DrsServer.PORT; }
 
     private static final AppService INSTANCE = new AppService();
     private AppService() {}
@@ -95,6 +99,32 @@ public final class AppService {
         return send(new DrsRequest(DrsRequest.CMD_DEPT_UPDATES_SAVE, u)).getData();
     }
 
+    // ── Resources ─────────────────────────────────────────────────────────
+    public List<Resource> findAllResources() {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_FIND_ALL)).getData();
+    }
+
+    public List<Resource> findResourcesByType(String resourceType) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_FIND_BY_TYPE, resourceType)).getData();
+    }
+
+    public Optional<Resource> findResourceById(int id) {
+        return Optional.ofNullable(
+                send(new DrsRequest(DrsRequest.CMD_RESOURCES_FIND_BY_ID, id)).getData());
+    }
+
+    public Resource saveResource(Resource resource) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_SAVE, resource)).getData();
+    }
+
+    public boolean updateResource(Resource resource) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_UPDATE, resource)).getData();
+    }
+
+    public boolean deleteResource(int id) {
+        return send(new DrsRequest(DrsRequest.CMD_RESOURCES_DELETE, id)).getData();
+    }
+
     // ── Evacuation Zones ───────────────────────────────────────────────────
     public List<EvacuationZone> findAllEvacuationZones() {
         return send(new DrsRequest(DrsRequest.CMD_EVAC_ZONES_FIND_ALL)).getData();
@@ -127,7 +157,7 @@ public final class AppService {
 
     // ── Transport ──────────────────────────────────────────────────────────
     private DrsResponse send(DrsRequest request) {
-        try (Socket socket = new Socket(HOST, PORT);
+        try (Socket socket = new Socket(host, port);
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream  in  = new ObjectInputStream(socket.getInputStream())) {
 
