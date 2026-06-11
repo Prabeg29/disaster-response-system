@@ -12,11 +12,9 @@
 -- SHA-256("password") = 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
 -- =============================================================================
 
-CREATE DATABASE IF NOT EXISTS drs_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS drs;
 
-USE drs_db;
+USE drs;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 1. users
