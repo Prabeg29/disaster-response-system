@@ -18,6 +18,7 @@ public class EvacuationZone implements Serializable {
     private int           currentOccupancy;
     private String        status;
     private int           reportId;
+    private String        notes;
     private LocalDateTime createdAt;
 
     public EvacuationZone() {
@@ -27,13 +28,15 @@ public class EvacuationZone implements Serializable {
             String name,
             String location,
             int capacity,
-            int reportId) {
+            int reportId,
+            String notes) {
         this.name             = name;
         this.location         = location;
         this.capacity         = capacity;
         this.currentOccupancy = 0;
         this.status           = STATUS_ACTIVE;
         this.reportId         = reportId;
+        this.notes            = notes;
         this.createdAt        = LocalDateTime.now();
     }
 
@@ -45,6 +48,7 @@ public class EvacuationZone implements Serializable {
             int currentOccupancy,
             String status,
             int reportId,
+            String notes,
             LocalDateTime createdAt) {
         this.id               = id;
         this.name             = name;
@@ -53,6 +57,7 @@ public class EvacuationZone implements Serializable {
         this.currentOccupancy = currentOccupancy;
         this.status           = status;
         this.reportId         = reportId;
+        this.notes            = notes;
         this.createdAt        = createdAt;
     }
 
@@ -63,6 +68,7 @@ public class EvacuationZone implements Serializable {
     public int getCurrentOccupancy()    { return currentOccupancy; }
     public String getStatus()           { return status; }
     public int getReportId()            { return reportId; }
+    public String getNotes()            { return notes; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     public void setId(int id)                             { this.id = id; }
@@ -72,12 +78,13 @@ public class EvacuationZone implements Serializable {
     public void setCurrentOccupancy(int currentOccupancy) { this.currentOccupancy = currentOccupancy; }
     public void setStatus(String status)                  { this.status = status; }
     public void setReportId(int reportId)                 { this.reportId = reportId; }
+    public void setNotes(String notes)                    { this.notes = notes; }
     public void setCreatedAt(LocalDateTime createdAt)     { this.createdAt = createdAt; }
 
     @Override
     public String toString() {
         return String.format(
                 "[%d] %s at %s | %d/%d | %s",
-                id, name, location, currentOccupancy, capacity, status);
+                id, name, location, currentOccupancy, capacity, status, notes);
     }
 }

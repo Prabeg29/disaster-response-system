@@ -28,7 +28,7 @@
            style="-fx-padding:8 28 8 28;"/>
 
     <!-- ── Main content: split pane ────────────────────────────────────── -->
-    <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.60">
+    <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.58">
 
         <!-- LEFT: Evacuation zones table -->
         <VBox styleClass="content-body" spacing="10">
@@ -41,14 +41,14 @@
                        VBox.vgrow="ALWAYS"
                        styleClass="data-table">
                 <columns>
-                    <TableColumn fx:id="colName"        text="Name"       prefWidth="150"/>
-                    <TableColumn fx:id="colLocation"    text="Location"   prefWidth="160"/>
-                    <TableColumn fx:id="colCapacity"    text="Capacity"   prefWidth="80"/>
-                    <TableColumn fx:id="colOccupancy"   text="Occupancy"  prefWidth="90"/>
-                    <TableColumn fx:id="colStatus"      text="Status"     prefWidth="90"/>
-                    <TableColumn fx:id="colReportId"    text="Report #"   prefWidth="80"/>
-                    <TableColumn fx:id="colCreatedAt"   text="Created"    prefWidth="130"/>
-                    <TableColumn fx:id="colAction"      text="Action"     prefWidth="80"/>
+                    <TableColumn fx:id="colName"        text="Name"       prefWidth="140"/>
+                    <TableColumn fx:id="colLocation"    text="Location"   prefWidth="150"/>
+                    <TableColumn fx:id="colCapacity"    text="Capacity"   prefWidth="75"/>
+                    <TableColumn fx:id="colOccupancy"   text="Occupancy"  prefWidth="80"/>
+                    <TableColumn fx:id="colStatus"      text="Status"     prefWidth="80"/>
+                    <TableColumn fx:id="colReportId"    text="Report #"   prefWidth="70"/>
+                    <TableColumn fx:id="colCreatedAt"   text="Created"    prefWidth="120"/>
+                    <TableColumn fx:id="colAction"      text="Actions"    prefWidth="190"/>
                 </columns>
                 <placeholder>
                     <Label text="No evacuation zones found. Create one using the form."
@@ -57,7 +57,7 @@
             </TableView>
         </VBox>
 
-        <!-- RIGHT: Create / Update occupancy form -->
+        <!-- RIGHT: Create / Edit / Update occupancy form -->
         <VBox styleClass="form-panel" spacing="0" minWidth="300">
 
             <!-- Form header with tab-like toggle -->
@@ -71,57 +71,134 @@
                             text="Create"
                             styleClass="btn-primary"
                             onAction="#handleModeCreate"/>
+                    <Button fx:id="btnModeEdit"
+                            text="Edit Zone"
+                            styleClass="btn-secondary"
+                            onAction="#handleModeEdit"/>
                     <Button fx:id="btnModeUpdate"
-                            text="Update Occupancy"
+                            text="Update Occ."
                             styleClass="btn-secondary"
                             onAction="#handleModeUpdate"/>
                 </HBox>
             </VBox>
 
             <!-- Create form -->
-            <VBox fx:id="createFormPane" styleClass="form-body" spacing="16">
-                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <ScrollPane fx:id="createScrollPane" fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+                <VBox fx:id="createFormPane" styleClass="form-body" spacing="16">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
-                <VBox spacing="6">
-                    <Label text="Zone Name" styleClass="field-label"/>
-                    <TextField fx:id="nameField"
-                               styleClass="field-input"
-                               promptText="e.g. Central Park Shelter"/>
+                    <VBox spacing="6">
+                        <Label text="Zone Name" styleClass="field-label"/>
+                        <TextField fx:id="nameField"
+                                   styleClass="field-input"
+                                   promptText="e.g. Central Park Shelter"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Location / Address" styleClass="field-label"/>
+                        <TextField fx:id="locationField"
+                                   styleClass="field-input"
+                                   promptText="e.g. 123 Main St, Springfield"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Capacity (max people)" styleClass="field-label"/>
+                        <TextField fx:id="capacityField"
+                                   styleClass="field-input"
+                                   promptText="e.g. 500"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Linked Disaster Report" styleClass="field-label"/>
+                        <ComboBox fx:id="reportCombo"
+                                  styleClass="field-combo"
+                                  maxWidth="Infinity"
+                                  promptText="Select a report…"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Notes (optional)" styleClass="field-label"/>
+                        <TextArea fx:id="notesArea"
+                                  styleClass="field-textarea"
+                                  promptText="Any additional information…"
+                                  prefRowCount="3"
+                                  wrapText="true"/>
+                    </VBox>
+
+                    <Label fx:id="createValidationLabel"
+                           styleClass="validation-label"
+                           wrapText="true"
+                           managed="false" visible="false"/>
+
+                    <Button fx:id="createBtn"
+                            text="Create Zone"
+                            styleClass="btn-primary"
+                            maxWidth="Infinity"
+                            onAction="#handleCreate"/>
                 </VBox>
+            </ScrollPane>
 
-                <VBox spacing="6">
-                    <Label text="Location / Address" styleClass="field-label"/>
-                    <TextField fx:id="locationField"
-                               styleClass="field-input"
-                               promptText="e.g. 123 Main St, Springfield"/>
+            <!-- Edit form (hidden by default) -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane"
+                        managed="false" visible="false" fx:id="editScrollPane">
+                <VBox fx:id="editFormPane" styleClass="form-body" spacing="16">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+                    <Label fx:id="editZoneLabel"
+                           text="No zone selected — click Edit in the table."
+                           styleClass="section-subtitle"
+                           wrapText="true"/>
+
+                    <VBox spacing="6">
+                        <Label text="Zone Name" styleClass="field-label"/>
+                        <TextField fx:id="editNameField"
+                                   styleClass="field-input"
+                                   promptText="e.g. Central Park Shelter"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Location / Address" styleClass="field-label"/>
+                        <TextField fx:id="editLocationField"
+                                   styleClass="field-input"
+                                   promptText="e.g. 123 Main St, Springfield"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Capacity (max people)" styleClass="field-label"/>
+                        <TextField fx:id="editCapacityField"
+                                   styleClass="field-input"
+                                   promptText="e.g. 500"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Linked Disaster Report" styleClass="field-label"/>
+                        <ComboBox fx:id="editReportCombo"
+                                  styleClass="field-combo"
+                                  maxWidth="Infinity"
+                                  promptText="Select a report…"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Notes (optional)" styleClass="field-label"/>
+                        <TextArea fx:id="editNotesArea"
+                                  styleClass="field-textarea"
+                                  promptText="Any additional information…"
+                                  prefRowCount="3"
+                                  wrapText="true"/>
+                    </VBox>
+
+                    <Label fx:id="editValidationLabel"
+                           styleClass="validation-label"
+                           wrapText="true"
+                           managed="false" visible="false"/>
+
+                    <Button fx:id="editBtn"
+                            text="Save Changes"
+                            styleClass="btn-primary"
+                            maxWidth="Infinity"
+                            onAction="#handleEditSave"/>
                 </VBox>
-
-                <VBox spacing="6">
-                    <Label text="Capacity (max people)" styleClass="field-label"/>
-                    <TextField fx:id="capacityField"
-                               styleClass="field-input"
-                               promptText="e.g. 500"/>
-                </VBox>
-
-                <VBox spacing="6">
-                    <Label text="Linked Disaster Report" styleClass="field-label"/>
-                    <ComboBox fx:id="reportCombo"
-                              styleClass="field-combo"
-                              maxWidth="Infinity"
-                              promptText="Select a report…"/>
-                </VBox>
-
-                <Label fx:id="createValidationLabel"
-                       styleClass="validation-label"
-                       wrapText="true"
-                       managed="false" visible="false"/>
-
-                <Button fx:id="createBtn"
-                        text="Create Zone"
-                        styleClass="btn-primary"
-                        maxWidth="Infinity"
-                        onAction="#handleCreate"/>
-            </VBox>
+            </ScrollPane>
 
             <!-- Update occupancy form (hidden by default) -->
             <VBox fx:id="updateFormPane" styleClass="form-body" spacing="16"
@@ -129,7 +206,7 @@
                 <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
                 <Label fx:id="selectedZoneLabel"
-                       text="No zone selected — click 'Select' in the table."
+                       text="No zone selected — click 'Occ.' in the table."
                        styleClass="section-subtitle"
                        wrapText="true"/>
 

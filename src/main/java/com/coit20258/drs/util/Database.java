@@ -145,6 +145,14 @@ public class Database {
                 // Column already exists — safe to ignore duplicate column error (1060)
             }
 
+            // Add notes column to evacuation_zones if it doesn't exist yet
+            try {
+                stmt.executeUpdate(
+                        "ALTER TABLE evacuation_zones ADD COLUMN notes TEXT NULL");
+            } catch (SQLException ignored) {
+                // Column already exists — safe to ignore duplicate column error (1060)
+            }
+
             // -----------------------------------------------------------------
             // 5. evacuation_zones   (depends on disaster_reports)
             // -----------------------------------------------------------------

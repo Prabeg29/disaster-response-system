@@ -288,6 +288,21 @@
     -fx-background-color: #1e429f;
 }
 
+/* ── Danger/delete button ───────────────────────────────────────── */
+.btn-danger {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 12px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #b91c1c;
+}
+
 /* ── Assessment form ───────────────────────────────────────────── */
 .scroll-pane {
     -fx-background-color: #f0f2f5;
