@@ -120,14 +120,25 @@ public class ClientHandler implements Runnable {
                 case DrsRequest.CMD_EVAC_ZONES_FIND_BY_REPORT ->
                     DrsResponse.ok(evacZoneDao.findByReportId(req.argInt(0)));
 
+                case DrsRequest.CMD_EVAC_ZONES_FIND_BY_ID ->
+                    DrsResponse.ok(evacZoneDao.findById(req.argInt(0)).orElse(null));
+
                 case DrsRequest.CMD_EVAC_ZONES_SAVE -> {
                     EvacuationZone z = req.arg(0);
                     yield DrsResponse.ok(evacZoneDao.create(z));
                 }
 
+                case DrsRequest.CMD_EVAC_ZONES_UPDATE -> {
+                    EvacuationZone z = req.arg(0);
+                    yield DrsResponse.ok(evacZoneDao.update(z));
+                }
+
                 case DrsRequest.CMD_EVAC_ZONES_UPDATE_OCC ->
                     DrsResponse.ok(evacZoneDao.updateOccupancy(
                             req.argInt(0), req.argInt(1), req.argStr(2)));
+
+                case DrsRequest.CMD_EVAC_ZONES_DELETE ->
+                    DrsResponse.ok(evacZoneDao.delete(req.argInt(0)));
 
                 default -> DrsResponse.error("Unknown command: " + req.getCommand());
             };
