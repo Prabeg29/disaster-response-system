@@ -1,0 +1,76 @@
+@startuml Sequence_Login
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor black
+skinparam sequenceLifeLineBorderColor black
+skinparam sequenceBoxBorderColor black
+skinparam noteBorderColor black
+skinparam noteBackgroundColor white
+
+title Sequence Diagram 1 — User Login
+
+actor "User" as user
+participant "LoginController" as lc
+participant "AppService" as svc
+participant "DrsServer\n(TCP :9090)" as server
+participant "ClientHandler" as handler
+participant "UserDaoImpl" as dao
+database "MySQL" as db
+
+user -> lc : enters email + password\nclicks Login
+
+activate lc
+lc -> lc : validate fields\n(non-empty check)
+
+lc -> svc : login(email, SHA256(password))\n[background Thread]
+activate svc
+
+svc -> svc : new DrsRequest\n(CMD_LOGIN, email, hash)
+svc -> server : open Socket\nserialise DrsRequest\n(ObjectOutputStream)
+activate server
+
+server -> handler : accept() →\npool.execute(ClientHandler)
+activate handler
+
+handler -> handler : deserialise DrsRequest\nread command = CMD_LOGIN
+
+handler -> dao : login(email, passwordHash)
+activate dao
+
+dao -> db : SELECT * FROM users\nWHERE email = ?\nAND passwordHash = ?
+activate db
+db --> dao : ResultSet (0 or 1 row)
+deactivate db
+
+alt row found
+    dao --> handler : Optional<User> (present)
+else no match
+    dao --> handler : Optional<User> (empty)
+end
+
+deactivate dao
+
+handler -> handler : wrap result in\nDrsResponse(success=true)
+handler --> server : serialise DrsResponse\n(ObjectOutputStream)
+deactivate handler
+
+server --> svc : deserialise DrsResponse
+deactivate server
+
+svc --> lc : Optional<User>
+deactivate svc
+
+alt user present
+    lc -> lc : SessionContext\n.setCurrentUser(user)
+    lc -> lc : Platform.runLater:\nSceneManager.switchContent\n(role-based destination)
+    lc --> user : navigates to main view
+else empty Optional
+    lc --> user : show error:\n"Invalid email or password"
+end
+
+deactivate lc
+
+@enduml

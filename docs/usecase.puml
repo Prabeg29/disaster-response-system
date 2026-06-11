@@ -1,0 +1,119 @@
+@startuml UseCase_DRS
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultTextAlignment center
+skinparam ActorFontStyle bold
+skinparam PackageFontStyle bold
+skinparam ArrowFontSize 11
+
+title DRS-Enhanced — Use Case Diagram
+
+left to right direction
+
+' ─────────────────────────────────────────────────────────────────
+' Actors
+' ─────────────────────────────────────────────────────────────────
+actor "Reporter" as reporter
+actor "Operator" as operator
+actor "Administrator" as admin
+actor "Department\nCoordinator" as deptCoord
+
+' Operator is a specialisation of Reporter (inherits all Reporter use cases)
+reporter <|-- operator
+' Administrator is a specialisation of Operator
+operator <|-- admin
+
+' ─────────────────────────────────────────────────────────────────
+' System boundary
+' ─────────────────────────────────────────────────────────────────
+rectangle "DRS-Enhanced" {
+
+    package "Authentication" {
+        usecase "Register Account" as UC_REG
+        usecase "Login" as UC_LOGIN
+        usecase "Logout" as UC_LOGOUT
+    }
+
+    package "Disaster Reporting" {
+        usecase "Submit Disaster Report" as UC_RPT_NEW
+        usecase "View Disaster Reports" as UC_RPT_VIEW
+        usecase "Update Report Status" as UC_RPT_STATUS
+        usecase "Filter Reports\nby Department" as UC_RPT_FILTER
+    }
+
+    package "Disaster Assessment" {
+        usecase "Assess Disaster Report" as UC_ASSESS
+        usecase "Update Existing Assessment" as UC_ASSESS_UPD
+        usecase "View Assessment List" as UC_ASSESS_LIST
+    }
+
+    package "Priority Dashboard" {
+        usecase "View Priority Dashboard" as UC_DASH
+    }
+
+    package "Evacuation Zone Management" {
+        usecase "Create Evacuation Zone" as UC_EZ_CREATE
+        usecase "Edit Evacuation Zone" as UC_EZ_EDIT
+        usecase "Update Zone Occupancy" as UC_EZ_OCC
+        usecase "Delete Evacuation Zone" as UC_EZ_DEL
+    }
+
+    package "Resource Management" {
+        usecase "Add Resource" as UC_RES_ADD
+        usecase "Edit Resource" as UC_RES_EDIT
+        usecase "Delete Resource" as UC_RES_DEL
+        usecase "Filter Resources by Type" as UC_RES_FILTER
+    }
+
+    package "Department Coordination" {
+        usecase "View Assigned Reports" as UC_DEPT_VIEW
+        usecase "Post Department Update" as UC_DEPT_POST
+        usecase "View Update History" as UC_DEPT_HIST
+    }
+}
+
+' ─────────────────────────────────────────────────────────────────
+' Reporter associations
+' ─────────────────────────────────────────────────────────────────
+reporter --> UC_REG
+reporter --> UC_LOGIN
+reporter --> UC_LOGOUT
+reporter --> UC_RPT_NEW
+reporter --> UC_RPT_VIEW
+reporter --> UC_EZ_CREATE
+reporter --> UC_EZ_EDIT
+reporter --> UC_EZ_OCC
+reporter --> UC_EZ_DEL
+reporter --> UC_RES_ADD
+reporter --> UC_RES_EDIT
+reporter --> UC_RES_DEL
+reporter --> UC_RES_FILTER
+
+' ─────────────────────────────────────────────────────────────────
+' Operator — additional use cases beyond Reporter
+' ─────────────────────────────────────────────────────────────────
+operator --> UC_RPT_STATUS
+operator --> UC_RPT_FILTER
+operator --> UC_ASSESS
+operator --> UC_ASSESS_UPD
+operator --> UC_ASSESS_LIST
+operator --> UC_DASH
+
+' ─────────────────────────────────────────────────────────────────
+' Department Coordinator (independent — no inheritance)
+' ─────────────────────────────────────────────────────────────────
+deptCoord --> UC_LOGIN
+deptCoord --> UC_LOGOUT
+deptCoord --> UC_DEPT_VIEW
+deptCoord --> UC_DEPT_POST
+deptCoord --> UC_DEPT_HIST
+
+' ─────────────────────────────────────────────────────────────────
+' Relationships between use cases
+' ─────────────────────────────────────────────────────────────────
+UC_ASSESS ..> UC_ASSESS_UPD  : <<extend>>
+UC_DEPT_POST ..> UC_DEPT_HIST : <<include>>
+
+@enduml
