@@ -29,55 +29,7 @@ DRS Enhanced is a disaster response coordination platform that allows emergency 
 
 The application is a single JVM process that acts as both the TCP server and the JavaFX client simultaneously.
 
-```
-┌─────────────────────────────────────────────────────┐
-│                  JavaFX Client (GUI)                │
-│                                                     │
-│   LoginView / RegisterView                          │
-│        │                                            │
-│   AppShellView + SidebarView                        │
-│        │                                            │
-│   ┌────┴────────────────────────────────────┐       │
-│   │  Controllers (MVC)                      │       │
-│   │  DashboardController                    │       │
-│   │  DisasterReport{List,Form}Controller    │       │
-│   │  DisasterAssessment{List,}Controller    │       │
-│   │  DepartmentCoordinationController       │       │
-│   │  EvacuationZoneController               │       │
-│   │  ResourceController                     │       │
-│   └────────────────┬───────────────────────-┘       │
-│                    │  calls                         │
-│             AppService (singleton TCP client)       │
-└────────────────────┼────────────────────────────────┘
-                     │  Java Object Serialisation
-                     │  over TCP socket (localhost:9090)
-┌────────────────────┼────────────────────────────────┐
-│                    │  TCP Server                    │
-│             DrsServer (daemon thread)               │
-│          Fixed thread pool — 10 workers             │
-│                    │                                │
-│             ClientHandler (per connection)          │
-│          Deserialises DrsRequest → dispatches       │
-│          → serialises DrsResponse back              │
-│                    │                                │
-│   ┌────────────────┴───────────────────────┐        │
-│   │  DAO Layer (one instance per handler)  │        │
-│   │  UserDaoImpl                           │        │
-│   │  DisasterReportDaoImpl                 │        │
-│   │  DisasterAssessmentDaoImpl             │        │
-│   │  DepartmentDaoImpl / UpdateDaoImpl     │        │
-│   │  EvacuationZoneDaoImpl                 │        │
-│   │  ResourceDaoImpl                       │        │
-│   └────────────────┬───────────────────────┘        │
-└────────────────────┼────────────────────────────────┘
-                     │  JDBC
-┌────────────────────┼────────────────────────────────┐
-│            MySQL Database (drs_db)                  │
-│   users · disaster_reports · disaster_assessments   │
-│   departments · department_updates                  │
-│   evacuation_zones · resources                      │
-└─────────────────────────────────────────────────────┘
-```
+![system-architeture](./images/System-Architecture.png)
 
 **Request lifecycle:**
 1. A controller calls a method on `AppService`.
@@ -195,7 +147,7 @@ The container exposes MySQL on **port 4306** (mapped from the container's 3306).
 Create the database manually. The application creates all tables automatically on first launch.
 
 ```sql
-CREATE DATABASE drs_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS drs;
 ```
 
 ---
