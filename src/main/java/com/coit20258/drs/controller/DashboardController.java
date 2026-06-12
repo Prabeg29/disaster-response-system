@@ -19,11 +19,22 @@ import com.coit20258.drs.model.DisasterAssessment;
 import com.coit20258.drs.model.DisasterReport;
 import com.coit20258.drs.service.AppService;
 
+/**
+ * DashboardController — Priority Dashboard View
+ *
+ * Displays real-time aggregate statistics for all disaster reports
+ * (total, critical, high severity, resolved) and a table of assessed
+ * disasters ranked by priority score in descending order.
+ *
+ * Implemented by: Poojitha Myneni
+ * COIT20258 — Assignment 3, HE T1 2026
+ */
 public class DashboardController implements Initializable {
 
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    // ── Banner ─────────────────────────────────────────────────────────────
     @FXML private Label bannerLabel;
 
     // ── Stat card labels ───────────────────────────────────────────────────
@@ -44,23 +55,37 @@ public class DashboardController implements Initializable {
     private final AppService service = AppService.getInstance();
     private final ObservableList<DisasterAssessment> tableData = FXCollections.observableArrayList();
 
+    /**
+     * Called automatically by JavaFX after the FXML fields are injected.
+     * Sets up the table columns and loads initial dashboard data.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTable();
         loadData();
     }
 
+    /**
+     * Handles the Refresh button click — reloads all dashboard data
+     * from the server on a background thread.
+     */
     @FXML
     private void handleRefresh() {
         loadData();
     }
 
+    /**
+     * Fetches all reports and assessments from the server on a background
+     * thread, computes stat-card values, sorts assessments by priority score
+     * (descending), and updates the UI on the JavaFX Application Thread.
+     */
     private void loadData() {
         new Thread(() -> {
             try {
-                List<DisasterReport>    reports     = service.findAllReports();
+                List<DisasterReport>     reports     = service.findAllReports();
                 List<DisasterAssessment> assessments = service.findAllAssessments();
 
+                // ── Compute stat card counts ───────────────────────────
                 long total    = reports.size();
                 long critical = reports.stream()
                         .filter(r -> DisasterReport.SEVERITY_CRITICAL.equals(r.getSeverityLevel()))
@@ -72,10 +97,12 @@ public class DashboardController implements Initializable {
                         .filter(r -> DisasterReport.STATUS_RESOLVED.equals(r.getStatus()))
                         .count();
 
+                // ── Sort assessments by priority score descending ──────
                 List<DisasterAssessment> sorted = assessments.stream()
                         .sorted((a, b) -> Integer.compare(b.getPriorityScore(), a.getPriorityScore()))
                         .toList();
 
+                // ── Update UI on Application Thread ───────────────────
                 Platform.runLater(() -> {
                     totalLabel.setText(String.valueOf(total));
                     criticalLabel.setText(String.valueOf(critical));
@@ -83,55 +110,88 @@ public class DashboardController implements Initializable {
                     resolvedLabel.setText(String.valueOf(resolved));
                     tableData.setAll(sorted);
                 });
+
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, "Failed to load dashboard data", ex);
-                Platform.runLater(() -> showBanner("Could not load data: " + ex.getMessage(), false));
+                Platform.runLater(() ->
+                        showBanner("Could not load dashboard data: " + ex.getMessage(), false));
             }
         }, "load-dashboard-thread").start();
     }
 
+    /**
+     * Configures each TableColumn with a cell factory or cell value factory.
+     * Columns that show data from the nested DisasterReport object use custom
+     * cell factories because PropertyValueFactory cannot traverse nested objects.
+     */
     private void setupTable() {
+        // Score column — direct property on DisasterAssessment
         colScore.setCellValueFactory(new PropertyValueFactory<>("priorityScore"));
 
+        // Type column — sourced from the nested DisasterReport
         colType.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(String s, boolean empty) {
+            @Override
+            protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) { setText(null); return; }
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    return;
+                }
                 DisasterReport r = ((DisasterAssessment) getTableRow().getItem()).getDisasterReport();
                 setText(r != null ? r.getDisasterType() : "—");
             }
         });
 
+        // Location column — sourced from the nested DisasterReport
         colLocation.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(String s, boolean empty) {
+            @Override
+            protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) { setText(null); return; }
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    return;
+                }
                 DisasterReport r = ((DisasterAssessment) getTableRow().getItem()).getDisasterReport();
                 setText(r != null ? r.getLocation() : "—");
             }
         });
 
+        // Severity column — direct property on DisasterAssessment
         colSeverity.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(String s, boolean empty) {
+            @Override
+            protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) { setText(null); return; }
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    return;
+                }
                 setText(((DisasterAssessment) getTableRow().getItem()).getAssessedSeverity());
             }
         });
 
+        // Assessed By column — sourced from the nested User object
         colAssessedBy.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(String s, boolean empty) {
+            @Override
+            protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) { setText(null); return; }
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    return;
+                }
                 var u = ((DisasterAssessment) getTableRow().getItem()).getAssessedBy();
                 setText(u != null ? u.getFullName() : "—");
             }
         });
 
+        // Assessed At column — formatted timestamp
         colAssessedAt.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(String s, boolean empty) {
+            @Override
+            protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) { setText(null); return; }
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    return;
+                }
                 var dt = ((DisasterAssessment) getTableRow().getItem()).getAssessedAt();
                 setText(dt != null ? dt.format(DATE_FMT) : "—");
             }
@@ -140,6 +200,12 @@ public class DashboardController implements Initializable {
         priorityTable.setItems(tableData);
     }
 
+    /**
+     * Shows a coloured banner message at the top of the view.
+     *
+     * @param msg     the message to display
+     * @param success true for a green success banner, false for a red error banner
+     */
     private void showBanner(String msg, boolean success) {
         bannerLabel.setText(msg);
         bannerLabel.getStyleClass().removeAll("success-label", "validation-label");
